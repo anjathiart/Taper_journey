@@ -1,2 +1,2 @@
 # Taper_journal
-An app where you can track your journey on psychiatric medications
+An app where you can track your journey of being on psychiatric / psychoactive medications
