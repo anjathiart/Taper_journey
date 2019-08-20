@@ -1,0 +1,26 @@
+{% extends "layout.html" %}
+
+{% block main %}
+
+    <!-- http://getbootstrap.com/docs/4.1/components/alerts/ -->
+    <div class="alert alert-success" role="alert">
+        <h4 class="alert-heading">Data captured</h4>
+    </div>
+        <table>
+            <tr>
+                <th>Name</th>
+                <th>Gender</th>
+                <th>Diet</th>
+            </tr>
+            {% for row in data %}
+            <tr>
+                {% for item in row %}
+                <td>{{ item }} </td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+
+        </table>
+
+
+{% endblock %}

@@ -1,0 +1,135 @@
+{% extends "layout.html" %}
+
+{% block main %}
+<!-- Modal TODO: Showing up behind background -->
+
+<div class="modal" id="journalModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="z-index:30">
+                <h5 class="modal-title" id="exampleModalLabel">Document your journey for today</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="" method="POST">
+                    <textarea class="form-control" name="journalEntry" style="height:50vh" value="" autofocus></textarea>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="split left">
+    <div class="img-container centered-all">
+        <img src='../static/img/img_splitscreen_01.jpg' style="width:400px";
+    </div>
+</div>
+
+<div class="split right">
+    <div class="centered-vertically">
+        <div style="width:300px; margin: 20px auto">
+                <form action="/taper" method="post">
+                <div class="form-group">
+                    <select class = "form-control" name="drug">
+                        <option value="Choose a drug" disabled>Choose a drug</option>
+                        <option value="Abilify">Abilify</option>
+                        <option value="Cymbalta">Cymbalta</option>
+                        <option value="Epitec">Epitec</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <input type="number" class="form-control" id="dosage" value = '100' autofocus name="dose"
+                        placeholder="Dosage" style="max-width:300px">
+                </div>
+                <div class="form-group">
+                    <select class="form-control" name="mood">
+                        <option value = "Rate your mood" disabled>Rate your mood</option>
+                        <option value = "1">1</option>
+                        <option value = "2">2</option>
+                        <option value = "3">3</option>
+                        <option value = "4">4</option>
+                        <option value = "5">5</option>
+                        <option value = "6">6</option>
+                        <option value = "7">7</option>
+                        <option value = "8">8</option>
+                        <option value = "9">9</option>
+                        <option value = "10">10</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <h6>Side Effects</h6>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" name="fatigue" value="fatigue">
+                        <label class="form-check-label" for="inlineCheckbox1">Fatigue</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" name="weightgain" value="weight gain">
+                        <label class="form-check-label" for="inlineCheckbox2">Weight Gain</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" name="weightloss" value="weight loss">
+                        <label class="form-check-label" for="inlineCheckbox3">Weight Loss</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" name="headache" value="headache">
+                        <label class="form-check-label" for="inlineCheckbox3">Headache</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" name="nausea" value="nausea">
+                        <label class="form-check-label" for="inlineCheckbox3">Nausea</label>
+                    </div>
+                </div>
+                <!-- http://getbootstrap.com/docs/4.1/components/buttons/ -->
+                <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#journalModal">Write in journal</button>
+                <br>
+                <br>
+                <button type="submit" class="btn btn-secondary">Update your Journey</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+    <script>
+
+       function checkform() {
+           if (this.yourName.value ==='') {
+               alert("Please enter your name");
+               return false;
+           }
+          if (this.gender.value === "Gender") {
+               alert("Please specify your gender");
+               return false;
+           }
+           let diet = document.querySelectorAll("input[name='diet'");
+           radio_checked = false;
+           for (i = 0; i < 5; i++) {
+               if(diet[i].checked === true) {
+                   radio_checked = true;
+                   break;
+               }
+           }
+           if (radio_checked === false) {
+               alert("Please select what diet you follow");
+               return false;
+           }
+
+           function signin() {
+               console.log ("User is trying to sign in");
+           }
+       }
+
+    </script>
+
+{% endblock %}

@@ -1,0 +1,126 @@
+/* TODO */
+body, html {
+    margin: 0px;
+    padding: 0px;
+}
+
+* {
+    box-sizing: border-box;
+}
+.background {
+    height: 100vh;
+    min-width:800px;
+    min-height: 800px;
+    text-align: center;
+    background-position: center;
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+
+.welcomeBackground {
+    background-image: url('img/img_background_05.jpg');
+    background-color: rgb(252, 223, 161);
+}
+
+.signupBackground {
+    background-image: url('img/yellow_backgrounds_cones.jpg');
+    background-color: rgb(252, 223, 161);
+}
+.signinBackground {
+    background-image: url('img/img_background_06.jpg');
+    background-color: rgb(252, 223, 161);
+}
+
+#welcomeHeader {
+    color: rgb(252, 223, 161);
+}
+
+#welcomeHeader p {
+    font-size: 2em;
+    text-shadow: 1px 1px 3px #BA3A27;
+}
+
+#welcomeHeader h1 {
+    font-size: 4em;
+    text-shadow: 4px 4px 12px #BA3A27;
+}
+
+
+input {
+    box-shadow: 0px 0px 4px gray;
+}
+
+select {
+    box-shadow: 0px 0px 4px gray;
+}
+
+input[type=checkbox] {
+    box-shadow: none;
+}
+
+
+button {
+    box-shadow: 2px 2px 4px gray;
+}
+
+.bg-custom {
+    background-color: #4C4E53;
+}
+
+
+/******************
+Split screen styles
+******************/
+/* Split the screen in half */
+.split {
+  height: 100%;
+  width: 50%;
+  position: fixed;
+
+  top: 0px;
+  margin-top: 40px;
+  overflow-x: hidden;
+}
+
+.modal-background {
+    z-index: -3;
+}
+
+
+/* Control the left side */
+.left {
+  left: 0;
+}
+
+/* Control the right side */
+.right {
+  right: 0;
+}
+
+/* If you want the content centered horizontally and vertically */
+.centered-all {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
+.centered-vertically {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    transform: translate(0, -50%);
+
+}
+
+.img-container img {
+    border-radius: 20%;
+}
+
+
+
+
+
+
