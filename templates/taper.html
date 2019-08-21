@@ -1,7 +1,10 @@
 {% extends "layout.html" %}
 
+{% block title %}
+    Taper
+{% endblock %}
+
 {% block main %}
-<!-- Modal TODO: Showing up behind background -->
 
 <div class="modal" id="journalModal" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
@@ -13,9 +16,7 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form action="" method="POST">
-                    <textarea class="form-control" name="journalEntry" style="height:50vh" value="" autofocus></textarea>
-                </form>
+                    <textarea class="form-control" name="journal" style="height:50vh" value="" autofocus></textarea>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -32,7 +33,10 @@
 <div class="split right">
     <div class="centered-vertically">
         <div style="width:300px; margin: 20px auto">
-                <form action="/taper" method="post">
+
+                <div class ="form-group">
+                    <input id="myDatepicker" class = "form-control" name="date">
+                </div>
                 <div class="form-group">
                     <select class = "form-control" name="drug">
                         <option value="Choose a drug" disabled>Choose a drug</option>
@@ -87,21 +91,33 @@
                 <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#journalModal">Write in journal</button>
                 <br>
                 <br>
-                <button type="submit" class="btn btn-secondary">Update your Journey</button>
-            </form>
+                <button type="button" id="submitAll" class="btn btn-secondary">Update your Journey</button>
+
         </div>
     </div>
 </div>
 
-
-
-
-
-
-
-
-
     <script>
+        $(document).ready(function() {
+            $('#submitAll').on("click", function(event) {
+
+                event.preventDefault()
+                // Get some values from elements on the page:
+                var date = $("[name='date']").val()
+                var drug = $("[name='drug']").val()
+                var dose = $("[name='dose']").val()
+                var mood = $("[name='mood']").val()
+                var journal = $("[name='journal']").val()
+                var data = { date: date, drug: drug, dose: dose,  mood: mood, journal: journal}
+                console.log(JSON.stringify(data))
+
+                $.post("/tapercheck", data).done(function(){
+                    console.log("done")
+                })
+                 $(location).attr('href',"/");
+            });
+        });
+
 
        function checkform() {
            if (this.yourName.value ==='') {
@@ -128,6 +144,8 @@
            function signin() {
                console.log ("User is trying to sign in");
            }
+
+
        }
 
     </script>

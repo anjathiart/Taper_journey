@@ -6,9 +6,28 @@
 <header class="masthead">
   <div class="container py-5 h-100">
       <div class="row h-100 justify-content-center align-items-center">
-        <div class="col-12">
-            <h1 class="font-weight-light">Taper Journey</h1>
-            <p class="lead">Track your Taper Journy</p>
+        <div class="col-12 summary">
+            <h1 class="font-weight-light">Journey Status</h1>
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th scope="col"></th>
+                        <th scope="col">Current dosage</th>
+                        <th scope="col">Entry date</th>
+                        <th class="text-right reference_num" scope="col">Reference Number</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in summary %}
+                    <tr>
+                        <th scope="row">{{ row.drug | upper }}</th>
+                        <td>{{ row.dose }} mg</td>
+                        <td> {{ row.entry_date }}</td>
+                        <td class="text-right reference_num" id = {{ row.id }}><div> {{row.user_id}}/{{ row.id }} </div></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
     </div>
   </div>

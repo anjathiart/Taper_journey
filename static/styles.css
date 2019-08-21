@@ -119,8 +119,25 @@ Split screen styles
     border-radius: 20%;
 }
 
+label.col-sm-2.right-label {
+        text-align: right;
+        margin-right: 20px;
+}
+
+.user-inpput, .password-input, .email-input {
+    width: 300px;
+}
+
+.submit-button {
+    float: left;
+}
 
 
+button {
+    cursor: pionter;
+}
 
-
-
+table .reference_num {
+    color: gray;
+    font-style: italic;
+}

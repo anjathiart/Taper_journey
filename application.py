@@ -3,13 +3,13 @@ import csv
 from datetime import date
 
 from cs50 import SQL
-from flask import Flask, flash, jsonify, redirect, render_template, request, session
+from flask import Flask, flash, json, jsonify, redirect, render_template, request, session
 from flask_session import Session
 from tempfile import mkdtemp
 from werkzeug.exceptions import default_exceptions, HTTPException, InternalServerError
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from helpers import apology, login_required
+from helpers import apology, signin_required
 
 
 # Configure application
@@ -36,31 +36,34 @@ app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
 # Configure CS50 Library to use SQLite database
-db = SQL("sqlite:///taper_journal.db")
+db = SQL("sqlite:///taper_journey.db")
 
-@app.route("/", methods=["GET"])
-def get_index():
-    if session.get('user_id'):
-        return render_template("/home.html")
-    else:
-        return redirect("/welcome")
 
-@app.route("/", methods=["GET"])
+@app.route("/")
+@signin_required
 def index():
-    if not session["user_id"]:
-        return redirect("/signin")
+
+    # if user has not yet logged any drugs render taper page
+    if not db.execute("SELECT * FROM entries WHERE user_id=?", session["user_id"]):
+        return redirect ("/taper")
     else:
-        return render_template("home.html")
+        #initialise summary
+        summary = [];
 
-
-@app.route("/welcome", methods=["GET"])
-def welcome():
-    return render_template("welcome.html")
-
-@app.route("/signup", methods=["GET"])
-def get_signup():
-    return render_template("signup.html")
-
+        # get a list of the all the drugs that the user is tracking
+        row_drugs = db.execute("SELECT DISTINCT drug FROM entries WHERE user_id=?", session["user_id"])
+        drugs = []
+        print(f"{row_drugs}")
+        for row in row_drugs:
+            drugs.append(row["drug"])
+        print(f"list of drugs: {drugs}")
+        for d in drugs:
+            row_drugEntries = db.execute("SELECT * FROM entries WHERE drug =? AND user_id =? ORDER BY entry_date DESC", (d, session["user_id"]))
+            latest_entry=row_drugEntries[0]
+            print(f"{latest_entry}")
+            summary.append(latest_entry)
+        print(f"summary: {summary}")
+        return render_template("home.html", summary=summary)
 @app.route("/signin", methods=["GET", "POST"])
 def signin():
 
@@ -69,25 +72,23 @@ def signin():
 
     if request.method == "POST":
 
-
         # Validate input
         if not request.form.get("username"):
-            return apology("No username entered", 403)
+            return apology("No username entered", 400)
         if not request.form.get("password"):
-            return apology("No password entered", 403)
+            return apology("No password entered", 400)
 
        # Query database for username
-        rows = db.execute("SELECT * FROM users WHERE username = :username",
-                          username=request.form.get("username"))
+        rows = db.execute("SELECT * FROM users WHERE username = ?", request.form.get("username"))
 
         # Ensure username exists and password is correct
         if len(rows) != 1 or not check_password_hash(rows[0]["hash"], request.form.get("password")):
-            return apology("invalid username and/or password", 403)
+            return apology("invalid username and/or password", 400)
 
-        # Remember which user has logged in
         session["user_id"] = rows[0]["id"]
         return redirect("/")
     else:
+        print("You are in the get signin route")
         return render_template("signin.html")
 
 
@@ -96,54 +97,89 @@ def signup():
 
     if request.method == "POST":
 
-        username = request.form.get('username')
+        usernameinput = request.form.get('username')
         email = request.form.get('email')
         password = request.form.get('password')
 
         #--> Validate input
-        if not username:
-            return apology("No username entered", 403)
-        if not email:
-            return apology("No email entered", 403)
+        if not usernameinput:
+            return apology("No username entered", 400)
+        #if not email:
+            return apology("No email entered", 400)
         if not password:
-            return apology("No password entered", 403)
+            return apology("No password entered", 400)
 
         #--> hash the password
+
         passwordHash = generate_password_hash(request.form.get("password", "sha256"))
 
         # Query database to check that the username is not already taken and insert into database if not
-        if db.execute("SELECT username FROM users WHERE username = ?", (username)):
-            return apology("username already used", 403);
+        if db.execute("SELECT username FROM users WHERE username = ?", (usernameinput)):
+            return apology("The username is not available")
         else:
-            db.execute("INSERT INTO users (id, username, email, hash) VALUES (NULL, ?, ?, ?)", ( username,email,passwordHash))
+            db.execute("INSERT INTO users (id, username, email, hash) VALUES (NULL, ?, ?, ?)", ( usernameinput,email,passwordHash))
             return redirect("/signin")
 
     else:
         return render_template("signup.html")
 
 @app.route("/taper", methods=["GET", "POST"])
+@signin_required
 def taper():
 
     if request.method == "POST":
+        print(f"{request.form}")
+        print(f"I'm in the taper post route")
+        # user_id = session["user_id"]
+        # date = request.form.get("date")
+        # drug = request.form.get('drug')
+        # dose = request.form.get('dose')
+        # mood = request.form.get("mood")
+        # journal = request.form.get("journalEntry")
 
-        drug = request.form.get('drug')
-        dose = request.form.get('dose')
+        # #--> Validate input
+        # if not drugz$:
+        #     return apology("No drug chosen", 400)
+        # if not dose:
+        #     return apology("No dose entered", 400)
 
-        #--> Validate input
-        if not drug:
-            return apology("No drug chosen", 403)
-        if not dose:
-            return apology("No dose entered", 403)
+        # # insert data into entries table / capture taper entry
+        # if db.execute("SELECT drug FROM entries WHERE id = ?", drug):
+        #     return apology("medication already registered", 400);
+        # else:
+        #     db.execute("INSERT INTO entries (id, drug, dose, mood, user_id, entry_date, journal) VALUES (NULL, ?, ?, ?,?,?, ?)", ( drug,dose,mood, session["user_id"], date, journal))
+        #     return apology("TODO", 400)
 
-        # Query medication to check that the username is not already taken and insert into database if not
-        if db.execute("SELECT drug FROM taper_actions WHERE id = ?", (session['user_id'])):
-            return apology("medication already registered", 403);
-        else:
-            db.execute("INSERT INTO taper_actions (id, drug, dose, mood) VALUES (NULL, ?, ?, ?)", ( drug,dose,mood))
-            return apology("TODO")
+        return apology("TODO", 400)
 
     else:
+        print(f"I'm in the taper GEt route")
         return render_template("taper.html")
+
+@app.route("/tapercheck", methods=["POST"])
+@signin_required
+def tapercheck():
+
+    # capture data
+    user_id = session["user_id"]
+    date = request.form.get("date")
+    drug = request.form.get('drug')
+    dose = request.form.get('dose')
+    mood = request.form.get("mood")
+    journal = request.form.get("journalEntry")
+
+    #--> Validate input
+    if not drug:
+        return apology("No drug chosen", 400)
+    if not dose:
+        return apology("No dose entered", 400)
+    if not mood:
+        return apology("No mood entered", 400)
+
+    # insert data into entries table / capture taper entry
+    db.execute("INSERT INTO entries (id, drug, dose, mood, user_id, entry_date, journal) VALUES (NULL, ?, ?, ?,?,?, ?)",( drug,dose,mood, session["user_id"], date, journal))
+    return redirect ("/")
+
 
 @app.route("/logout")
 def logout():
@@ -153,4 +189,4 @@ def logout():
     session.clear()
 
     # Redirect user to login form
-    return redirect("/")
+    return redirect("/signin")
