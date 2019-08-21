@@ -50,20 +50,16 @@ def index():
     else:
         #initialise summary
         summary = [];
-
         # get a list of the all the drugs that the user is tracking
         row_drugs = db.execute("SELECT DISTINCT drug FROM entries WHERE user_id=?", session["user_id"])
         drugs = []
-        print(f"{row_drugs}")
         for row in row_drugs:
             drugs.append(row["drug"])
         print(f"list of drugs: {drugs}")
         for d in drugs:
             row_drugEntries = db.execute("SELECT * FROM entries WHERE drug =? AND user_id =? ORDER BY entry_date DESC", (d, session["user_id"]))
             latest_entry=row_drugEntries[0]
-            print(f"{latest_entry}")
             summary.append(latest_entry)
-        print(f"summary: {summary}")
         return render_template("home.html", summary=summary)
 @app.route("/signin", methods=["GET", "POST"])
 def signin():
@@ -129,8 +125,6 @@ def signup():
 def taper():
 
     if request.method == "POST":
-        print(f"{request.form}")
-        print(f"I'm in the taper post route")
         return apology("TODO", 400)
     else:
         return render_template("taper.html")
@@ -148,7 +142,8 @@ def tapercheck():
     drug = request.form.get('drug')
     dose = request.form.get('dose')
     mood = request.form.get("mood")
-    journal = request.form.get("journalEntry")
+    side_effects = request.form.get("side_effects")
+    journal = request.form.get("journal")
 
     #--> Validate input
     if not drug:
@@ -159,7 +154,7 @@ def tapercheck():
         return apology("No mood entered", 400)
 
     # insert data into entries table / capture taper entry
-    db.execute("INSERT INTO entries (id, drug, dose, mood, user_id, entry_date, journal) VALUES (NULL, ?, ?, ?,?,?, ?)",( drug,dose,mood, session["user_id"], date, journal))
+    db.execute("INSERT INTO entries (id, drug, dose, mood,side_effects, journal, user_id, entry_date) VALUES (NULL, ?, ?, ?,?,?,?,?)",( drug,dose,mood,side_effects, journal, session["user_id"], date))
     return redirect ("/")
 
 

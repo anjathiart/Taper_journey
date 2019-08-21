@@ -1,0 +1,64 @@
+{% extends "layout.html" %}
+
+{% block main %}
+
+<!-- Full Page Image Header with Vertically Centered Content -->
+<header class="masthead">
+  <div class="container py-5 h-100">
+      <div class="row h-100 justify-content-center align-items-center">
+        <div class="col-12 summary">
+            <h1 class="font-weight-light">Journey Status</h1>
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th scope="col">Medicine</th>
+                        <th scope="col" class="text-center">Dose</th>
+                        <th scope="col" class="text-center">Mood</th>
+                        <th scope="col" class="text-center">Date</th>
+
+                        <th class="text-right reference_num" scope="col">Reference Number</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in summary %}
+                    <tr>
+                        <th scope="row">{{ row.drug | upper }} </th>
+                        <td class="text-center">{{ row.dose | round | int }} mg</td>
+                        <td class="text-center">{{ row.mood }} / 10</td>
+                        <td class="text-center"> {{ row.entry_date }}</td>
+                        <td class="text-right reference_num" id = {{ row.id }}>{{row.user_id}}/{{ row.id }}<button style="float:left">details</button></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <button id = "btn-continue">Continue journey</button>
+            <button id = "btn-stats">View stats</button>
+        </div>
+    </div>
+  </div>
+</header>
+
+<!-- Page Content -->
+<section class="container py-5">
+</div>
+</section>
+
+<script>
+    $(document).ready(function() {
+            $('#btn-continue').on("click", function(event) {
+                event.preventDefault()
+                 $(location).attr('href',"/taper");
+            });
+            $('#btn-stats').on("click", function(event) {
+                event.preventDefault()
+                 $(location).attr('href',"/history");
+            });
+
+        });
+
+
+
+</script>
+
+
+{% endblock %}

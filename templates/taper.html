@@ -108,18 +108,25 @@
                 var dose = $("[name='dose']").val()
                 var mood = $("[name='mood']").val()
                 var journal = $("[name='journal']").val()
-                var data = { date: date, drug: drug, dose: dose,  mood: mood, journal: journal}
-                console.log(JSON.stringify(data))
+                var side_effects_array =[]
+                $("input:checkbox:checked").each(function(){
+                    side_effects_array.push($(this).val());
+                });
+                var side_effects = side_effects_array.join()
+                var data = { date: date, drug: drug, dose: dose,  mood: mood, side_effects: side_effects, journal: journal}
 
-                $.post("/tapercheck", data).done(function(){
+                $.post("/tapercheck", data, function(data){
+                    $(location).attr('href',"/");
+                }).done(function(){
                     console.log("done")
-                })
-                 $(location).attr('href',"/");
+                }).fail(function(xhr, status, error) {
+                    // error handling
+                    alert("error")
+                });
             });
         });
 
 
-        $datepicker.datepicker('setDate', new Date());
 
 
        function checkform() {
