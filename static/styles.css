@@ -134,10 +134,17 @@ label.col-sm-2.right-label {
 
 
 button {
-    cursor: pionter;
+    cursor: pointer;
 }
 
 table .reference_num {
     color: gray;
     font-style: italic;
 }
+
+
+select option { color: black; }
+select option:first-child { color: grey; }
+select.empty { color: grey; }
+/* Hidden placeholder */
+select option[disabled]:first-child { display: none; }

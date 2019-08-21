@@ -1,6 +1,6 @@
 import cs50
 import csv
-from datetime import date
+import datetime
 
 from cs50 import SQL
 from flask import Flask, flash, json, jsonify, redirect, render_template, request, session
@@ -8,6 +8,7 @@ from flask_session import Session
 from tempfile import mkdtemp
 from werkzeug.exceptions import default_exceptions, HTTPException, InternalServerError
 from werkzeug.security import check_password_hash, generate_password_hash
+from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 
 from helpers import apology, signin_required
 
@@ -130,30 +131,8 @@ def taper():
     if request.method == "POST":
         print(f"{request.form}")
         print(f"I'm in the taper post route")
-        # user_id = session["user_id"]
-        # date = request.form.get("date")
-        # drug = request.form.get('drug')
-        # dose = request.form.get('dose')
-        # mood = request.form.get("mood")
-        # journal = request.form.get("journalEntry")
-
-        # #--> Validate input
-        # if not drugz$:
-        #     return apology("No drug chosen", 400)
-        # if not dose:
-        #     return apology("No dose entered", 400)
-
-        # # insert data into entries table / capture taper entry
-        # if db.execute("SELECT drug FROM entries WHERE id = ?", drug):
-        #     return apology("medication already registered", 400);
-        # else:
-        #     db.execute("INSERT INTO entries (id, drug, dose, mood, user_id, entry_date, journal) VALUES (NULL, ?, ?, ?,?,?, ?)", ( drug,dose,mood, session["user_id"], date, journal))
-        #     return apology("TODO", 400)
-
         return apology("TODO", 400)
-
     else:
-        print(f"I'm in the taper GEt route")
         return render_template("taper.html")
 
 @app.route("/tapercheck", methods=["POST"])
@@ -162,7 +141,10 @@ def tapercheck():
 
     # capture data
     user_id = session["user_id"]
-    date = request.form.get("date")
+
+    #parse the date
+    dateFormatted = request.form.get("date")
+    date = datetime.datetime.strptime(dateFormatted, "%A, %d %b %Y").strftime("%Y-%m-%d")
     drug = request.form.get('drug')
     dose = request.form.get('dose')
     mood = request.form.get("mood")

@@ -12,22 +12,26 @@
                 <thead>
                     <tr>
                         <th scope="col"></th>
-                        <th scope="col">Current dosage</th>
-                        <th scope="col">Entry date</th>
+                        <th scope="col" class="text-center">Latest dosage</th>
+                        <th scope="col" class="text-center">Latest mood</th>
+                        <th scope="col" class="text-center">Entry date</th>
                         <th class="text-right reference_num" scope="col">Reference Number</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for row in summary %}
                     <tr>
-                        <th scope="row">{{ row.drug | upper }}</th>
-                        <td>{{ row.dose }} mg</td>
-                        <td> {{ row.entry_date }}</td>
-                        <td class="text-right reference_num" id = {{ row.id }}><div> {{row.user_id}}/{{ row.id }} </div></td>
+                        <th scope="row">{{ row.drug | upper }} </th>
+                        <td class="text-center">{{ row.dose | round | int }} mg</td>
+                        <td class="text-center">{{ row.mood }} / 10</td>
+                        <td class="text-center"> {{ row.entry_date }}</td>
+                        <td class="text-right reference_num" id = {{ row.id }}>{{row.user_id}}/{{ row.id }}<button style="float:left">details</button></td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
+            <button id = "btn-continue">Continue journey</button>
+            <button id = "btn-stats">View stats</button>
         </div>
     </div>
   </div>
@@ -37,5 +41,23 @@
 <section class="container py-5">
 </div>
 </section>
+
+<script>
+    $(document).ready(function() {
+            $('#btn-continue').on("click", function(event) {
+                event.preventDefault()
+                 $(location).attr('href',"/taper");
+            });
+            $('#btn-stats').on("click", function(event) {
+                event.preventDefault()
+                 $(location).attr('href',"/history");
+            });
+
+        });
+
+
+
+</script>
+
 
 {% endblock %}
