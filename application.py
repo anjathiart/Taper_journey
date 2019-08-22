@@ -50,7 +50,7 @@ def index():
     else:
         #initialise summary
         summary = [];
-        # get a list of the all the drugs that the user is tracking
+        # get a list of all the drugs that the user is tracking
         row_drugs = db.execute("SELECT DISTINCT drug FROM entries WHERE user_id=?", session["user_id"])
         drugs = []
         for row in row_drugs:
@@ -61,6 +61,8 @@ def index():
             latest_entry=row_drugEntries[0]
             summary.append(latest_entry)
         return render_template("home.html", summary=summary)
+
+
 @app.route("/signin", methods=["GET", "POST"])
 def signin():
 
@@ -147,15 +149,25 @@ def tapercheck():
 
     #--> Validate input
     if not drug:
-        return apology("No drug chosen", 400)
+        return apology("No dose chosen", 400)
     if not dose:
-        return apology("No dose entered", 400)
+        return apology("No dose chosen", 400)
     if not mood:
-        return apology("No mood entered", 400)
+        return apology("No mood specified", 400)
+    if not side_effects:
+        side_effects = "NULL"
+    if not journal:
+        journal = "NULL"
 
     # insert data into entries table / capture taper entry
-    db.execute("INSERT INTO entries (id, drug, dose, mood,side_effects, journal, user_id, entry_date) VALUES (NULL, ?, ?, ?,?,?,?,?)",( drug,dose,mood,side_effects, journal, session["user_id"], date))
-    return redirect ("/")
+    # If date already contains entries then the user is editing an existing entry
+    if db.execute("SELECT * FROM entries WHERE entry_date = ? AND user_id= ?", (date, session["user_id"])):
+        db.execute("UPDATE entries SET  drug=?, dose=?, mood=?,side_effects =?, journal =? WHERE entry_date = ? AND user_id = ?", (drug, dose, mood, side_effects, journal, date, session["user_id"]))
+        return redirect ("/")
+    else:
+        db.execute("INSERT INTO entries (id, drug, dose, mood,side_effects, journal, user_id, entry_date) VALUES (NULL, ?, ?, ?,?,?,?,?)",( drug,dose,mood,side_effects, journal, session["user_id"], date))
+        return redirect ("/")
+
 
 
 @app.route("/logout")

@@ -57,7 +57,7 @@
 
     <script>
     var today = new Date();
-    $('#myDatepicker').datepicker({ dateFormat: 'DD, dd M yy', endDate: "today", maxDate: today }).val();
+    $('#myDatepicker').datepicker({ dateFormat: 'DD, dd M yy', endDate: "today", maxDate: today, minDate: 0}).val();
     $('#myDatepicker').datepicker('setDate', new Date());
     </script>
 </html>
