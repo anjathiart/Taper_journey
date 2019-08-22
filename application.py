@@ -1,6 +1,6 @@
 import cs50
 import csv
-import datetime
+from datetime import datetime
 
 from cs50 import SQL
 from flask import Flask, flash, json, jsonify, redirect, render_template, request, session
@@ -125,7 +125,6 @@ def signup():
 @app.route("/taper", methods=["GET", "POST"])
 @signin_required
 def taper():
-
     if request.method == "POST":
         return apology("TODO", 400)
     else:
@@ -140,7 +139,7 @@ def tapercheck():
 
     #parse the date
     dateFormatted = request.form.get("date")
-    date = datetime.datetime.strptime(dateFormatted, "%A, %d %b %Y").strftime("%Y-%m-%d")
+    date = datetime.strptime(dateFormatted, "%A, %d %b %Y").strftime("%Y-%m-%d")
     drug = request.form.get('drug')
     dose = request.form.get('dose')
     mood = request.form.get("mood")
@@ -168,14 +167,37 @@ def tapercheck():
         db.execute("INSERT INTO entries (id, drug, dose, mood,side_effects, journal, user_id, entry_date) VALUES (NULL, ?, ?, ?,?,?,?,?)",( drug,dose,mood,side_effects, journal, session["user_id"], date))
         return redirect ("/")
 
+@app.route("/gettaperdata", methods=["POST"])
+@signin_required
+def gettaperdata():
+    # data to be populated
+    dateHTML = request.form.get("date")
+    dateSQL = datetime.strptime(dateHTML, "%A, %d %b %Y").strftime("%Y-%m-%d")
+
+    row = db.execute("SELECT * FROM entries WHERE user_id = ? AND entry_date = ?", (session["user_id"], dateSQL))
+    if not row:
+        data = {"drug": "None", "dose": "", "mood": "", "side_effects": "", "journal": "", "date": dateHTML}
+    else:
+        drug = row[0]["drug"]
+        dose = row[0]["dose"]
+        mood = row[0]["mood"]
+        if row[0]["side_effects"] == "NULL":
+            side_effects = ""
+        else:
+            side_effects = row[0]["side_effects"]
+        if row[0]["journal"] == "NULL":
+            journal = ""
+        else:
+            journal = row[0]["journal"]
+        data= {"drug": drug, "dose": dose, "mood": mood, "side_effects": side_effects, "journal": journal, "date": dateHTML}
+        print(f"{data}")
+    return data
 
 
 @app.route("/logout")
 def logout():
     """Log user out"""
-
     # Forget any user_id
     session.clear()
-
     # Redirect user to login form
     return redirect("/signin")

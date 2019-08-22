@@ -56,8 +56,87 @@
 
 
     <script>
+    function execute_test(){
+        console.log("javascript running")
+    }
     var today = new Date();
-    $('#myDatepicker').datepicker({ dateFormat: 'DD, dd M yy', endDate: "today", maxDate: today, minDate: 0}).val();
+    $('#myDatepicker').datepicker({ dateFormat: 'DD, dd M yy', endDate: "today", maxDate: today}).val();
     $('#myDatepicker').datepicker('setDate', new Date());
+
     </script>
+
+    <script>
+    function execute_test(){
+        console.log("javascript running")
+    }
+    $(document).ready(function() {
+
+        console.log("connected")
+
+        $.post("/gettaperdata", {date: $("#myDatepicker").val()}, function(data) {
+        }).done(function(data){
+           updateFields(data)
+        }).fail(function(xhr, status, error) {
+            alert(error)
+        });
+
+        $("#myDatepicker").change(function(){
+            $.post("/gettaperdata",{date: $("#myDatepicker").val()}, function(data) {
+            }).done(function(data){
+                updateFields(data)
+            }).fail(function(xhr, status, error) {
+                alert(error)
+            });
+        })
+
+        $('#submitAll').on("click", function(event) {
+
+            event.preventDefault()
+            // Get some values from elements on the page:
+            var date = $("[name='date']").val()
+            var drug = $("[name='drug']").val()
+            var dose = $("[name='dose']").val()
+            var mood = $("[name='mood']").val()
+            var journal = $("[name='journal']").val()
+            var side_effects_array =[]
+            $("input:checkbox:checked").each(function(){
+                side_effects_array.push($(this).val());
+            });
+            var side_effects = side_effects_array.join()
+            var data = { date: date, drug: drug, dose: dose,  mood: mood, side_effects: side_effects, journal: journal}
+
+            $.post("/tapercheck", data, function(data){
+                $(location).attr('href',"/");
+            }).done(function(){
+                console.log("done")
+            }).fail(function(xhr, status, error) {
+                // error handling
+                alert("error")
+            });
+        });
+
+        $(function () {
+            $('[data-toggle="popover"]').popover()
+        })
+    });
+
+
+    function updateFields(data) {
+        let side_effects_array = data.side_effects.split(",")
+        $('input:checkbox').removeAttr('checked');
+        $("#drug").val(data.drug);
+        $("#dosage").val(data.dose);
+        $("textarea").html(data.journal);
+        $("#modal-title").html(data.date);
+        $("#mood").val(data.mood);
+        console.log("testing")
+        for (let i=0; i<side_effects_array.length; i++) {
+            console.log(side_effects_array)
+            document.getElementsByName(side_effects_array[i])[0].checked = true;
+            console.log("in loop")
+        }
+        console.log("testing")
+    });
+
+</script>
 </html>

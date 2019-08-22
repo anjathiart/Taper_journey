@@ -1,163 +1,179 @@
 {% extends "layout.html" %}
-
-{% block title %}
-    Taper
-{% endblock %}
-
 {% block main %}
-
-<div class="modal" id="journalModal" tabindex="-1" role="dialog">
+<div  class="modal" id="journalModal" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header" style="z-index:30">
-                <h5 class="modal-title" id="exampleModalLabel">Document your journey for today</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                <h5 class="modal-title" id="modal-title"></h5>
             </div>
             <div class="modal-body">
-                    <textarea class="form-control" name="journal" style="height:50vh" value="" autofocus></textarea>
+                <textarea class="form-control" id="journal" value="" name="journal" style="height:50vh" value="" autofocus></textarea>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" style = "width: 100px" class="" data-dismiss="modal" aria-label="Close">Close</button>
             </div>
         </div>
     </div>
 </div>
+
 <div class="split left">
     <div class="img-container centered-all">
-        <img src='../static/img/img_splitscreen_01.jpg' style="width:400px";
+        <img src='../static/img/img_splitscreen_01.jpg' style="width:400px">
     </div>
 </div>
 
-<div class="split right">
+<div class="split right justify-content-center" id="taperForm">
     <div class="centered-vertically">
-        <div style="width:300px; margin: 20px auto">
-
-                <div class ="form-group">
-                    <input id="myDatepicker" class = "form-control" name="date" autocomplete="off">
+        <div style="width: 400px; margin: 0px auto">
+            <div class ="form-group form-inline row justify-content-end">
+                <label class="conrol-label col-sm-4">Select Date:</label>
+                <input id="myDatepicker" class = "form-control col-sm-8" name="date" autocomplete="off">
+            </div>
+            <div class="form-group form-inline row justify-content-end">
+                <label class= "conrol-label col-sm-4">Medication:</label>
+                <select class = "form-control col-sm-8" name="drug" id="drug" autocomplete="off">
+                    <option value ="None">Specify medication</option>
+                    <option value="Abilify">Abilify</option>
+                    <option value="Cymbalta">Cymbalta</option>
+                    <option value="Epitec">Epitec</option>
+                </select>
+            </div>
+            <div class="form-group row ml-auto justify-content-end">
+                <button style="width:100%" type = "button"  data-toggle="modal" data-target="#journalModal">Write in journal</button>
+            </div>
+            <hr>
+            <div class="form-group form-inline row justify-contents-end drug_data"  autocomplete="off">
+                <label class="control-label col-sm-4">Dose:</label>
+                <input  type="number" class="form-control col-sm-2" id="dosage" autofocus name="dose"
+                    style="width:40px" autocomplete="off" placeholder="0"
+                     data-toggle="popover" data-animation="true" data-content="Enter your daily dosage in milligrams" data-trigger="hover" data-placement="bottom">
+               <label class="conrol-label col-sm-4">Mood:</label>
+                <select class="form-control  col-sm-2" name="mood" id="mood" data-toggle="popover" data-animation="true" data-content="Enter your mood on a scale of 1 to 10" data-trigger="hover" data-placement="bottom">
+                    <option value = "0" >0</option>
+                    <option value = "1">1</option>
+                    <option value = "2">2</option>
+                    <option value = "3">3</option>
+                    <option value = "4">4</option>
+                    <option value = "5">5</option>
+                    <option value = "6">6</option>
+                    <option value = "7">7</option>
+                    <option value = "8">8</option>
+                    <option value = "9">9</option>
+                    <option value = "10">10</option>
+                </select>
+           </div>
+            <hr>
+            <div class="form-group inline-form text-center drug_data" >
+                <h6>Side Effects</h6>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" name="fatigue"  name="Fatigue" value="Fatigue">
+                    <label class="form-check-label" for="inlineCheckbox1">Fatigue</label>
                 </div>
-                <div class="form-group">
-                    <select class = "form-control" name="drug" autocomplete="off">
-                        <option value=""selected disabled>Medication name</option>
-                        <option value="Abilify">Abilify</option>
-                        <option value="Cymbalta">Cymbalta</option>
-                        <option value="Epitec">Epitec</option>
-                    </select>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" name="Weight-gain" value="Weight-gain">
+                    <label class="form-check-label" for="inlineCheckbox2">Weight-gain</label>
                 </div>
-                <div class="form-group" autocomplete="off">
-                    <input type="number" class="form-control" id="dosage" value = '' autofocus name="dose"
-                        placeholder="Dosage" style="max-width:300px" autocomplete="off">
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" name="Weight-loss" value="Weight-loss">
+                    <label class="form-check-label" for="inlineCheckbox3">Weight-loss</label>
                 </div>
-                <div class="form-group" autocomplete="off">
-                    <select class="form-control" name="mood">
-                        <option value = "" selected disabled>Rate your mood</option>
-                        <option value = "1">1</option>
-                        <option value = "2">2</option>
-                        <option value = "3">3</option>
-                        <option value = "4">4</option>
-                        <option value = "5">5</option>
-                        <option value = "6">6</option>
-                        <option value = "7">7</option>
-                        <option value = "8">8</option>
-                        <option value = "9">9</option>
-                        <option value = "10">10</option>
-                    </select>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" name="Headache" value="Headache">
+                    <label class="form-check-label" for="inlineCheckbox3">Headache</label>
                 </div>
-                <div class="form-group">
-                    <h6>Side Effects</h6>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="checkbox" name="fatigue" value="fatigue">
-                        <label class="form-check-label" for="inlineCheckbox1">Fatigue</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="checkbox" name="weightgain" value="weight gain">
-                        <label class="form-check-label" for="inlineCheckbox2">Weight Gain</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="checkbox" name="weightloss" value="weight loss">
-                        <label class="form-check-label" for="inlineCheckbox3">Weight Loss</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="checkbox" name="headache" value="headache">
-                        <label class="form-check-label" for="inlineCheckbox3">Headache</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="checkbox" name="nausea" value="nausea">
-                        <label class="form-check-label" for="inlineCheckbox3">Nausea</label>
-                    </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" name="Nausea" value="Nausea">
+                    <label class="form-check-label" for="inlineCheckbox3">Nausea</label>
                 </div>
-                <!-- http://getbootstrap.com/docs/4.1/components/buttons/ -->
-                <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#journalModal">Write in journal</button>
-                <br>
-                <br>
-                <button type="button" id="submitAll" class="btn btn-secondary">Update your Journey</button>
-
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" name="Sadness" value="Sadness">
+                    <label class="form-check-label" for="inlineCheckbox3">Sadness</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" name="Mania" value="Mania">
+                    <label class="form-check-label" for="inlineCheckbox3">Mania</label>
+                </div>
+            </div>
+            <hr>
+            <!-- http://getbootstrap.com/docs/4.1/components/buttons/ -->
+            <div class="Form-group row ml-auto justify-content-en drug_data">
+                <button style="width:100%" type="button" id="submitAll">Update your Journey</button>
+            </div>
         </div>
     </div>
 </div>
 
-    <script>
-        $(document).ready(function() {
-            $('#submitAll').on("click", function(event) {
 
-                event.preventDefault()
-                // Get some values from elements on the page:
-                var date = $("[name='date']").val()
-                var drug = $("[name='drug']").val()
-                var dose = $("[name='dose']").val()
-                var mood = $("[name='mood']").val()
-                var journal = $("[name='journal']").val()
-                var side_effects_array =[]
-                $("input:checkbox:checked").each(function(){
-                    side_effects_array.push($(this).val());
-                });
-                var side_effects = side_effects_array.join()
-                var data = { date: date, drug: drug, dose: dose,  mood: mood, side_effects: side_effects, journal: journal}
+<script language="javascript" type="text/javascript">
 
-                $.post("/tapercheck", data, function(data){
-                    $(location).attr('href',"/");
-                }).done(function(){
-                    console.log("done")
-                }).fail(function(xhr, status, error) {
-                    // error handling
-                    alert("error")
-                });
+    $(document).ready(function() {
+
+        console.log("connected")
+
+        $.post("/gettaperdata", {date: $("#myDatepicker").val()}, function(data) {
+        }).done(function(data){
+           updateFields(data)
+        }).fail(function(xhr, status, error) {
+            alert(error)
+        });
+
+        $("#myDatepicker").change(function(){
+            $.post("/gettaperdata",{date: $("#myDatepicker").val()}, function(data) {
+            }).done(function(data){
+                updateFields(data)
+            }).fail(function(xhr, status, error) {
+                alert(error)
+            });
+        })
+
+        $('#submitAll').on("click", function(event) {
+
+            event.preventDefault()
+            // Get some values from elements on the page:
+            var date = $("[name='date']").val()
+            var drug = $("[name='drug']").val()
+            var dose = $("[name='dose']").val()
+            var mood = $("[name='mood']").val()
+            var journal = $("[name='journal']").val()
+            var side_effects_array =[]
+            $("input:checkbox:checked").each(function(){
+                side_effects_array.push($(this).val());
+            });
+            var side_effects = side_effects_array.join()
+            var data = { date: date, drug: drug, dose: dose,  mood: mood, side_effects: side_effects, journal: journal}
+
+            $.post("/tapercheck", data, function(data){
+                $(location).attr('href',"/");
+            }).done(function(){
+                console.log("done")
+            }).fail(function(xhr, status, error) {
+                // error handling
+                alert("error")
             });
         });
 
+        $(function () {
+            $('[data-toggle="popover"]').popover()
+        })
+    });
 
 
+    function updateFields(data) {
+        let side_effects_array = data.side_effects.split(",")
+        $('input:checkbox').removeAttr('checked');
+        $("#drug").val(data.drug);
+        $("#dosage").val(data.dose);
+        $("textarea").html(data.journal);
+        $("#modal-title").html(data.date);
+        $("#mood").val(data.mood);
+        console.log("testing")
+        for (let i=0; i<side_effects_array.length; i++) {
+            console.log(side_effects_array)
+            document.getElementsByName(side_effects_array[i])[0].checked = true;
+            console.log("in loop")
+        }
+        console.log("testing")
+    }
 
-       function checkform() {
-           if (this.yourName.value ==='') {
-               alert("Please enter your name");
-               return false;
-           }
-          if (this.gender.value === "Gender") {
-               alert("Please specify your gender");
-               return false;
-           }
-           let diet = document.querySelectorAll("input[name='diet'");
-           radio_checked = false;
-           for (i = 0; i < 5; i++) {
-               if(diet[i].checked === true) {
-                   radio_checked = true;
-                   break;
-               }
-           }
-           if (radio_checked === false) {
-               alert("Please select what diet you follow");
-               return false;
-           }
-
-           function signin() {
-               console.log ("User is trying to sign in");
-           }
-
-
-       }
-
-    </script>
-
+</script>
 {% endblock %}

@@ -147,24 +147,34 @@ select option { color: black; }
 select option:first-child { color: grey; }
 select.empty { color: grey; }
 /* Hidden placeholder */
-select option[disabled]:first-child { display: none; }
 
-::placeholder {
-  color: red;
-  opacity: 1; /* Firefox */
-}
 
-:-ms-input-placeholder { /* Internet Explorer 10-11 */
- color: red;
-}
 
-::-ms-input-placeholder { /* Microsoft Edge */
- color: red;
-}
+
 
 .form-control::-webkit-input-placeholder {
   color: #4C4E53;
 }
 .form-control {
     color: #4C4E53 !important;
+}
+
+
+.control-label{
+    text-align: right; !important
+}
+
+div.form-inline label.col-sm-4{
+    justify-content: flex-end;
+}
+
+#taperForm button, #journalModal button, #home button {
+    padding: 5px;
+}
+
+.tooltip {
+    display:inline-block;
+    position:relative;
+    border-bottom:1px dotted #666;
+    text-align:left;
 }
