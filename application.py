@@ -130,9 +130,9 @@ def taper():
     else:
         return render_template("taper.html")
 
-@app.route("/tapercheck", methods=["POST"])
+@app.route("/posttaperdata", methods=["POST"])
 @signin_required
-def tapercheck():
+def posttaperdata():
 
     # capture data
     user_id = session["user_id"]
@@ -161,22 +161,23 @@ def tapercheck():
     # insert data into entries table / capture taper entry
     # If date already contains entries then the user is editing an existing entry
     if db.execute("SELECT * FROM entries WHERE entry_date = ? AND user_id= ?", (date, session["user_id"])):
-        db.execute("UPDATE entries SET  drug=?, dose=?, mood=?,side_effects =?, journal =? WHERE entry_date = ? AND user_id = ?", (drug, dose, mood, side_effects, journal, date, session["user_id"]))
+        db.execute("UPDATE entries SET  drug=?, dose=?, mood=?,side_effects =?  WHERE entry_date = ? AND user_id = ?", (drug, dose, mood, side_effects, date, session["user_id"]))
         return redirect ("/")
     else:
-        db.execute("INSERT INTO entries (id, drug, dose, mood,side_effects, journal, user_id, entry_date) VALUES (NULL, ?, ?, ?,?,?,?,?)",( drug,dose,mood,side_effects, journal, session["user_id"], date))
+        db.execute("INSERT INTO entries (id, drug, dose, mood,side_effects, user_id, entry_date) VALUES (NULL, ?, ?, ?,?,?,?)",( drug,dose,mood,side_effects, session["user_id"], date))
         return redirect ("/")
 
 @app.route("/gettaperdata", methods=["POST"])
 @signin_required
 def gettaperdata():
     # data to be populated
+    print(f"{request.form.get('date')}")
     dateHTML = request.form.get("date")
     dateSQL = datetime.strptime(dateHTML, "%A, %d %b %Y").strftime("%Y-%m-%d")
 
     row = db.execute("SELECT * FROM entries WHERE user_id = ? AND entry_date = ?", (session["user_id"], dateSQL))
     if not row:
-        data = {"drug": "None", "dose": "", "mood": "", "side_effects": "", "journal": "", "date": dateHTML}
+        data = {"drug": "None", "dose": "", "mood": "", "side_effects": "", "date": dateHTML}
     else:
         drug = row[0]["drug"]
         dose = row[0]["dose"]
@@ -189,9 +190,47 @@ def gettaperdata():
             journal = ""
         else:
             journal = row[0]["journal"]
-        data= {"drug": drug, "dose": dose, "mood": mood, "side_effects": side_effects, "journal": journal, "date": dateHTML}
+        data= {"drug": drug, "dose": dose, "mood": mood, "side_effects": side_effects, "date": dateHTML}
         print(f"{data}")
     return data
+
+@app.route("/postjournal", methods=["POST"])
+@signin_required
+def postjournal():
+
+     # data to be populated
+    journal = request.form.get("journal")
+    dateHTML = request.form.get("date")
+    dateSQL = datetime.strptime(dateHTML, "%A, %d %b %Y").strftime("%Y-%m-%d")
+
+    #check if th entry already exists, if it does make a update otherwise insert it into the existing database
+    if not db.execute("SELECT * FROM journals WHERE user_id = ? AND entry_date = ?", (session["user_id"], dateSQL)):
+        db.execute("INSERT INTO journals (journal_entry, user_id, entry_date) VALUES (?, ?, ?)", (journal, session["user_id"], dateSQL))
+    else:
+        db.execute("UPDATE journals SET journal_entry=?, user_id=?, entry_date = ?", (journal, session["user_id"], dateSQL))
+    return redirect("/")
+
+@app.route("/getjournal", methods=["POST"])
+@signin_required
+def getjournal():
+
+    # get the date for which a journal entry is requested
+    dateHTML = request.form.get("date")
+    dateSQL = datetime.strptime(dateHTML, "%A, %d %b %Y").strftime("%Y-%m-%d")
+
+    # check if there is a journal entry for this date
+    if not db.execute("SELECT * FROM journals WHERE entry_date = ? AND user_id = ?", (dateSQL, session["user_id"])):
+        return {"journal" : ""}
+    else:
+        print("YOu are in the route")
+        row = db.execute("SELECT * FROM journals WHERE entry_date = ? AND user_id = ?", (dateSQL, session["user_id"]))
+        return {"journal" : row[0]["journal_entry"]}
+
+
+
+
+
+
 
 
 @app.route("/logout")

@@ -178,3 +178,14 @@ div.form-inline label.col-sm-4{
     border-bottom:1px dotted #666;
     text-align:left;
 }
+
+.popover {
+    box-shadow: 2px 2px 0px 0px rgba(242, 95,105, 1);
+
+    color: white;
+}
+
+
+.ui-datepicker-calendar .ui-state-active{
+    background:red; !important
+}
