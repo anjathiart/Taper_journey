@@ -137,6 +137,15 @@ button {
     cursor: pointer;
 }
 
+button:hover {
+    background-color: rgba(242, 95,105, 0.2);;
+    border-color: rgba(242, 95,105, 1);
+    box-shadow: none;
+}
+
+button:focus {outline:0;}
+
+
 table .reference_num {
     color: gray;
     font-style: italic;
@@ -147,6 +156,35 @@ select option { color: black; }
 select option:first-child { color: grey; }
 select.empty { color: grey; }
 /* Hidden placeholder */
+
+ .ui-datepicker-today .ui-state-highlight {
+        background-color:darkGray;
+        border-color:  #4C4E53 ;
+        color: white;
+    }
+
+.ui-datepicker-current-day .ui-state-active {
+    background-color:rgba(242, 95,105, 0.2);
+    border-color: rgba(242, 95,105, 1);
+    color: black;
+}
+
+
+.ui-datepicker-calendar>tbody>tr:hover td a:not(.ui-state-highlight) {
+
+  font-weight: normal;
+  color: #555555;
+  border: 1px solid #999999;
+}
+
+.ui-datepicker-calendar>tbody>tr td:hover a:not(.ui-state-highlight) {
+    border-color: rgba(242, 95,105, 1);
+}
+
+.ui-datepicker-calendar> td:hover{
+    border-color: rgba(242, 95,105, 1);
+}
+
 
 
 
@@ -186,6 +224,35 @@ div.form-inline label.col-sm-4{
 }
 
 
-.ui-datepicker-calendar .ui-state-active{
-    background:red; !important
+.modal-header {
+    color: rgba(242, 95,105, 1);
 }
+
+.modal-content {
+
+}
+
+textarea:focus,
+textarea.form-control:focus,
+input.form-control:focus,
+input[type=text]:focus,
+input[type=password]:focus,
+input[type=email]:focus,
+input[type=number]:focus,
+[type=text].form-control:focus,
+[type=password].form-control:focus,
+[type=email].form-control:focus,
+[type=tel].form-control:focus,
+[contenteditable].form-control:focus,
+select.form-control:focus{
+    box-shadow: none;
+     border-color: rgba(242, 95,105, 1);
+  outline: 0 none;
+}
+
+input,
+select{
+    box-shadow: none
+}
+
+
