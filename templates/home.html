@@ -8,30 +8,31 @@
       <div class="row h-100 justify-content-center align-items-center">
         <div class="col-12 summary">
             <h1 class="font-weight-light">Journey Status</h1>
+            <p>Last updated on {{ data.date }} </p>
+            <p>Mood: {{ data.mood }} / 10</p>
             <table class="table table-hover">
                 <thead>
                     <tr>
-                        <th scope="col"></th>
-                        <th scope="col" class="text-center">Latest dosage</th>
-                        <th scope="col" class="text-center">Latest mood</th>
-                        <th scope="col" class="text-center">Entry date</th>
-                        <th class="text-right reference_num" scope="col">Reference Number</th>
+                        <th scope="col">Medication</th>
+                        <th scope="col" class="text-center">Dosage</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for row in summary %}
+                    {% for row in data.drugInfo %}
                     <tr>
-                        <th scope="row">{{ row.drug | upper }} </th>
-                        <td class="text-center">{{ row.dose | round | int }} mg</td>
-                        <td class="text-center">{{ row.mood }} / 10</td>
-                        <td class="text-center"> {{ row.entry_date }}</td>
-                        <td class="text-right reference_num" id = {{ row.id }}>{{row.user_id}}/{{ row.id }}</td>
+                        <td scope="row">{{ row.drug }} </th>
+                        <td class="text-center">{{ row.dose }} mg</td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
             <button id = "btn-continue">Continue journey</button>
             <button id = "btn-stats">View stats</button>
+            <br>
+            <br>
+            <div>
+               <p style="white-space: pre-wrap; color:gray"><em> {{ data.journal }} </em></p>
+            </div>
         </div>
     </div>
   </div>

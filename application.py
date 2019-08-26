@@ -1,6 +1,6 @@
 import cs50
 import csv
-from datetime import datetime
+from datetime import datetime, date
 
 from cs50 import SQL
 from flask import Flask, flash, json, jsonify, redirect, render_template, request, session
@@ -48,19 +48,28 @@ def index():
     if not db.execute("SELECT * FROM entries WHERE user_id=?", session["user_id"]):
         return redirect ("/taper")
     else:
-        #initialise summary
-        summary = [];
-        # get a list of all the drugs that the user is tracking
-        row_drugs = db.execute("SELECT DISTINCT drug FROM entries WHERE user_id=?", session["user_id"])
-        drugs = []
-        for row in row_drugs:
-            drugs.append(row["drug"])
+
+        #initialise drugInfo for day | date | object: drug, dose | mood |journal
+        drugInfo = [];
+        # get the info for the latest entry date
+        row = db.execute("SELECT * FROM entries WHERE user_id=? ORDER BY entry_date DESC", session["user_id"])
+        dateHTML = datetime.strptime(row[0]["entry_date"], "%Y-%m-%d").strftime("%A, %d %b %Y")
+        print(f"{row}")
+        if row[0]["drugs"] != "NULL":
+            drugs = row[0]["drugs"].split(",")
+            doses = row[0]["doses"].split(",")
+        side_effects = row[0]["side_effects"]
+        mood = row[0]["mood"]
+        journal = row[0]["journal"]
+
         print(f"list of drugs: {drugs}")
-        for d in drugs:
-            row_drugEntries = db.execute("SELECT * FROM entries WHERE drug =? AND user_id =? ORDER BY entry_date DESC", (d, session["user_id"]))
-            latest_entry=row_drugEntries[0]
-            summary.append(latest_entry)
-        return render_template("home.html", summary=summary)
+        for i in range(len(drugs)):
+            drugEntry = {"drug":  drugs[i], "dose": doses[i]}
+            print(f"{drugEntry}")
+            drugInfo.append(drugEntry)
+        print(f"{drugInfo}")
+        data = {"date": dateHTML, "drugInfo": drugInfo, "mood": mood, "side_effedts": side_effects, "journal": journal }
+        return render_template("home.html", data=data)
 
 
 @app.route("/signin", methods=["GET", "POST"])
@@ -126,9 +135,16 @@ def signup():
 @signin_required
 def taper():
     if request.method == "POST":
-        return apology("TODO", 400)
+        drug_options = ["Cymbalta", "Epitec", "Abilify", "Ivedel"]
+        side_effect_options = ["Fatigue", "Nausea", "Headache", "Weigt-gain", "Weight-los", "Mania", "Insomnia"]
+        pageData = {"drug_options": drug_options, "side_effect_options": side_effect_options}
+        return render_template("taper.html", pageData = pageData)
     else:
-        return render_template("taper.html")
+        drug_options = ["Cymbalta","Epitec","Abilify","Ivedel"]
+        side_effect_options = ["Fatigue","Nausea","Headache","Weigt-gain","Weight-los","Mania","Insomnia"]
+        pageData = {"drug_options": drug_options, "side_effect_options": side_effect_options}
+        print(f"{pageData}")
+        return render_template("taper.html", pageData = pageData)
 
 @app.route("/posttaperdata", methods=["POST"])
 @signin_required
@@ -140,47 +156,56 @@ def posttaperdata():
     #parse the date
     dateFormatted = request.form.get("date")
     date = datetime.strptime(dateFormatted, "%A, %d %b %Y").strftime("%Y-%m-%d")
-    drug = request.form.get('drug')
-    dose = request.form.get('dose')
+
+    drugs = request.form.get('drugs')
+    doses = request.form.get('doses')
     mood = request.form.get("mood")
-    side_effects = request.form.get("side_effects")
     journal = request.form.get("journal")
+    side_effects = request.form.get("side_effects")
 
     #--> Validate input
-    if not drug:
+    if not drugs:
         return apology("No dose chosen", 400)
-    if not dose:
+    if not doses:
         return apology("No dose chosen", 400)
     if not mood:
         return apology("No mood specified", 400)
     if not side_effects:
         side_effects = "NULL"
-    if not journal:
-        journal = "NULL"
 
     # insert data into entries table / capture taper entry
     # If date already contains entries then the user is editing an existing entry
     if db.execute("SELECT * FROM entries WHERE entry_date = ? AND user_id= ?", (date, session["user_id"])):
-        db.execute("UPDATE entries SET  drug=?, dose=?, mood=?,side_effects =?  WHERE entry_date = ? AND user_id = ?", (drug, dose, mood, side_effects, date, session["user_id"]))
+        db.execute("UPDATE entries SET  drugs=?, doses=?, mood=?,side_effects =?, journal=?  WHERE entry_date = ? AND user_id = ?", (drugs, doses, mood, side_effects, journal,  date, session["user_id"]))
         return redirect ("/")
     else:
-        db.execute("INSERT INTO entries (id, drug, dose, mood,side_effects, user_id, entry_date) VALUES (NULL, ?, ?, ?,?,?,?)",( drug,dose,mood,side_effects, session["user_id"], date))
+        db.execute("INSERT INTO entries (id, drugs, doses, mood,side_effects, user_id, entry_date , journal) VALUES (NULL, ?, ?, ?,?,?,?, ?)",( drugs,doses,mood,side_effects, session["user_id"], date, journal))
         return redirect ("/")
 
+# Sends the taper data for a specific date to the front end
 @app.route("/gettaperdata", methods=["POST"])
 @signin_required
 def gettaperdata():
+
     # data to be populated
-    print(f"{request.form.get('date')}")
     dateHTML = request.form.get("date")
     dateSQL = datetime.strptime(dateHTML, "%A, %d %b %Y").strftime("%Y-%m-%d")
 
     row = db.execute("SELECT * FROM entries WHERE user_id = ? AND entry_date = ?", (session["user_id"], dateSQL))
+    latest_drugs = ""
+    latest_doses = ""
     if not row:
-        data = {"drug": "None", "dose": "", "mood": "", "side_effects": "", "date": dateHTML}
+        row = db.execute("SELECT * FROM entries WHERE user_id= ? AND drugs IS NOT NULL AND entry_date <= ? ORDER BY entry_date DESC", (session["user_id"], dateSQL))
+        if not row:
+            latest_drugs = "None"
+            latest_doses = "None"
+        else:
+            latest_drugs = row[0]["drugs"]
+            latest_doses = row[0]["doses"]
+        data = {"drugs": "None", "doses": "", "mood": "", "side_effects": "", "date": dateHTML, "journal": "", "latest_drugs": latest_drugs,"latest_doses": latest_doses }
     else:
-        drug = row[0]["drug"]
-        dose = row[0]["dose"]
+        drugs = row[0]["drugs"]
+        doses = row[0]["doses"]
         mood = row[0]["mood"]
         if row[0]["side_effects"] == "NULL":
             side_effects = ""
@@ -190,9 +215,28 @@ def gettaperdata():
             journal = ""
         else:
             journal = row[0]["journal"]
-        data= {"drug": drug, "dose": dose, "mood": mood, "side_effects": side_effects, "date": dateHTML}
-        print(f"{data}")
+        data= {"drugs": drugs, "doses": doses, "mood": mood, "side_effects": side_effects, "date": dateHTML, "journal": journal,"latest_drugs": drugs,"latest_doses": doses}
     return data
+
+
+
+# get the latest list of drugs being tracked by the user and send to front end
+@app.route("/getlatestdrugs", methods=["POST"])
+@signin_required
+def getlatestdrugs():
+
+     # data to be populated
+    dateHTML = request.form.get("date")
+    dateSQL = datetime.strptime(dateHTML, "%A, %d %b %Y").strftime("%Y-%m-%d")
+
+
+    row = db.execute("SELECT * FROM entries WHERE user_id= ? AND drugs IS NOT NULL AND entry_date <= ? ORDER BY entry_date DESC", (session["user_id"], dateSQL))
+    if not row:
+        data = "None"
+    else:
+        data = row[0]["drugs"]
+    return data
+
 
 @app.route("/postjournal", methods=["POST"])
 @signin_required
@@ -204,7 +248,7 @@ def postjournal():
     dateSQL = datetime.strptime(dateHTML, "%A, %d %b %Y").strftime("%Y-%m-%d")
 
     #check if th entry already exists, if it does make a update otherwise insert it into the existing database
-    if not db.execute("SELECT * FROM journals WHERE user_id = ? AND entry_date = ?", (session["user_id"], dateSQL)):
+    if not db.execute("SELECT drugs, entry_date FROM journals WHERE user_id = ? AND entry_date = ?", (session["user_id"], dateSQL)):
         db.execute("INSERT INTO journals (journal_entry, user_id, entry_date) VALUES (?, ?, ?)", (journal, session["user_id"], dateSQL))
     else:
         db.execute("UPDATE journals SET journal_entry=?, user_id=?, entry_date = ?", (journal, session["user_id"], dateSQL))
@@ -218,19 +262,22 @@ def getjournal():
     dateHTML = request.form.get("date")
     dateSQL = datetime.strptime(dateHTML, "%A, %d %b %Y").strftime("%Y-%m-%d")
 
-    # check if there is a journal entry for this date
-    if not db.execute("SELECT * FROM journals WHERE entry_date = ? AND user_id = ?", (dateSQL, session["user_id"])):
+    # check if there are journal entries
+    if not db.execute("SELECT (journal, entry_date) FROM entries WHERE user_id = ? ORDER BY entry_date DESC", (session["user_id"])):
         return {"journal" : ""}
     else:
-        print("YOu are in the route")
-        row = db.execute("SELECT * FROM journals WHERE entry_date = ? AND user_id = ?", (dateSQL, session["user_id"]))
-        return {"journal" : row[0]["journal_entry"]}
+        row = db.execute("SELECT journal, entry_date FROM entries WHERE user_id = ? ORDER BY entry_date DESC", (session["user_id"]))
+        return {"journal" : row[0]["journal"]}
 
+@app.route("/getdrugoptionslist", methods=["POST"])
+@signin_required
+def getdrugoptionslist():
+    return {"options": ["Cymbalta", "Epitec", "Abilify", "Ivedel"]}
 
-
-
-
-
+@app.route("/getsideeffectslist", methods=["POST"])
+@signin_required
+def getsideefectslist():
+    return ["Fatigue", "Nausea", "Headache", "Weigt-gain", "Weight-los", "Mania", "Insomnia"]
 
 
 @app.route("/logout")

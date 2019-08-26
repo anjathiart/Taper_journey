@@ -135,6 +135,7 @@ label.col-sm-2.right-label {
 
 button {
     cursor: pointer;
+
 }
 
 button:hover {
@@ -244,10 +245,16 @@ input[type=number]:focus,
 [type=email].form-control:focus,
 [type=tel].form-control:focus,
 [contenteditable].form-control:focus,
-select.form-control:focus{
+select.form-control:focus
+range.form-control{
     box-shadow: none;
      border-color: rgba(242, 95,105, 1);
   outline: 0 none;
+}
+
+#myDatePicker {
+    border: 0;
+    outline: 0 none;
 }
 
 input,
@@ -255,4 +262,13 @@ select{
     box-shadow: none
 }
 
+
+.moodChosen {
+    color: rgba(242, 95,105, 1);;
+}
+
+
+.hidden {
+    display: none;
+}
 

@@ -1,72 +1,70 @@
 {% extends "layout.html" %}
 {% block main %}
-<div  class="modal" id="journalModal" tabindex="-1" role="dialog">
+<div  class="modal" id="trackDrugsModal" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <div class="modal-header" style="z-index:30" id="modal-title"></div>
+            <div class="modal-header" style="z-index:30"></div>
             <div class="modal-body">
-                <textarea class="form-control" id="journal" value="" name="journal" style="height:50vh" value="" autofocus></textarea>
+                <div id= "drugEntry">
+                    <table id="summaryTable" style="width: 50%">
+                        <thead><tr><th>Medication</th><th>Dose</th></tr></thead>
+                        <tbody></tbody>
+                    </table>
+                    <br>
+                    <div class = "btn-group pull-right">
+                        <button class="shadow-none" type="button" id="manageDrugs" style = "padding: 0px 20px" class=""
+                        data-toggle="collapse" data-target="#drugOptions">Add</button>
+                    </div>
+                    <div class="collapse" id="drugOptions">
+                        <hr>
+                        <div class="form-group inline-form text-center drugOptionCheckboxes" ></div>
+                        <button class="shadow-none"onclick = "updateDrugOptions()">Confirm</button>
+                    </div>
+                    <hr>
+                    <div id="sideEffectOptions" class="form-group inline-form text-center drug_data" >
+                        <h6>Side Effects</h6>
+                        {% for side_effect in pageData.side_effect_options %}
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" name="side_effect" id=  {{ "option" +  side_effect }} value= {{ side_effect }}>
+                            <label class="form-check-label" for={{ side_effect }}>{{ side_effect }}</label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <hr>
+                    <div class="form-group text-center" data-toggle="popover"
+                        data-animation="true"  data-content="Rate your mood. Where 1 is very poor and 10 is excellent"
+                        data-trigger="hover" data-placement="bottom" disabled>
+                        <h6 for="formControlRange" id="moodValue">Overall mood </h6>
+                        <input style="widht:100%" type="range" min ="1" max="10" step="1" class="form-control-range" name="mood" id="mood">
+                    </div>
+                </div>
+
+
             </div>
             <div class="modal-footer">
+
                 <div class = "btn-group pull-left">
-                    <button type="button" style = "width: 200px; float: left" class=""
-                    data-dismiss="modal" aria-label="Close">Discard changes</button>
-                </div>
-                <div class = "btn-group pull-right">
-                    <button type="button" id="saveJournal" style = "width: 100px" class=""
-                    data-dismiss="modal" aria-label="Save">Save</button>
+                    <button class="shadow-none" type="button" style = "width: 200px; float: left" class=""
+                    data-dismiss="modal" aria-label="Close">Save</button>
                 </div>
             </div>
         </div>
     </div>
 </div>
-<div  class="modal" id="drugModal" tabindex="-1" role="dialog">
+<div  class="modal" id="journalModal" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <div class="modal-header" style="z-index:30">Don't worry, your journey history won't be deleted</div>
+            <div class="modal-header" style="z-index:30" id="journal_modal-title"></div>
             <div class="modal-body">
-                <div id="drugNames" class="form-group inline-form text-center drug_data" >
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="checkbox" name="fatigue"  name="Ivedel" value="Ivedel">
-                        <label class="form-check-label" for="Ivedel">Ivedel</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="checkbox" name="Urbanol" value="Urbanol">
-                        <label class="form-check-label" for="Urbanol">Urbanol</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="checkbox" name="Dopaqual" value="Dopaqual">
-                        <label class="form-check-label" for="Dopaqual">Dopaqual</label>
-                    </div>
-
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="checkbox" name="Other" value="Other">
-                        <label class="form-check-label" for="Other" data-toggle='collapse' data-target='#otherInput'>Other</label>
-                    </div>
-
-                    <div class="collapse" id="otherInput" aria-expanded="false" aria-controls="otherInput">
-                        <input placeholder="Specify"  class = "form-control" >
-                    </div>
-                    <div>
-                         <input type='checkbox' data-toggle='collapse' data-target='#collapsediv1'> Other</input>
-                    </div>
-                    <div id='collapsediv1' class='collapse div1'>
-                        <br>
-                        <input placeholder="Specify"  class = "form-control" >
-                    </div>
-                </div>
+                <textarea class="form-control" id="journal" value="" name="journal" style="height:50vh" value="" autofocus></textarea>
             </div>
             <div class="modal-footer">
                 <div class = "btn-group pull-left">
-                    <button type="button" style = "width: 100px; float: left" class=""
-                    data-dismiss="modal" aria-label="Cancel">Cancel</button>
-                </div>
-                <div class = "btn-group pull-left">
-                    <button type="button" style = "width: 100px; float: left" class=""
-                    data-dismiss="modal" aria-label="Reset">Reset</button>
+                    <button class="shadow-none" type="button" style = "width: 200px; float: left" class=""
+                    data-dismiss="modal" aria-label="Close">Discard changes</button>
                 </div>
                 <div class = "btn-group pull-right">
-                    <button type="button" id="saveJournal" style = "width: 100px" class=""
+                    <button class="shadow-none" type="button" id="saveJournal" style = "width: 100px" class=""
                     data-dismiss="modal" aria-label="Save">Save</button>
                 </div>
             </div>
@@ -83,90 +81,18 @@
 <div class="split right justify-content-center" id="taperForm">
     <div class="centered-vertically">
         <div style="width: 400px; margin: 0px auto">
-            <div class ="form-group row ml-auto justify-content-end">
-                <input id="myDatepicker" class = "form-control form-control-lg" name="date" autocomplete="off">
+            <div class ="form-group row ml-auto justify-content-right">
+                <input id="myDatepicker" class = "form-control form-control-lg" name="date" autocomplete="off" >
+            </div>
+
+            <div class="form-group row ml-auto justify-content-end">
+                <button  class="shadow-none" type = "button" style="width:100%" data-toggle="modal" data-target="#journalModal">Write in journal</button>
             </div>
             <div class="form-group row ml-auto justify-content-end">
-                <button style="width:100%" type = "button"  data-toggle="modal" data-target="#journalModal">Write in journal</button>
+                <button  class="shadow-none" id="showDrugdata" style="width:100%" type = "button" data-toggle="modal" data-target="#trackDrugsModal">Track medication</button>
             </div>
-            <div class="form-group row ml-auto justify-content-end">
-                <button  id="showDrugdata" style="width:100%" type = "button" data-toggle="collapse" data-target="#drugdata"
-                aria-expanded="false" aria-controls="drugdata">Track medication</button>
-            </div>
-            <div class="collapse" id="drugdata">
-                <div class="form-group form-inline row justify-content-end">
-                    <label class= "conrol-label col-sm-4">Medication:</label>
-                    <select class = "form-control col-sm-8" name="drug" id="drug" autocomplete="off">
-                        <option value ="None">Specify medication</option>
-                        <option value="Abilify">Abilify</option>
-                        <option value="Cymbalta">Cymbalta</option>
-                        <option value="Epitec">Epitec</option>
-                    </select>
-                </div>
-                <div class="form-group form-inline row"  autocomplete="off">
-                    <label class="control-label col-sm-4">Dose:</label>
-                    <input  type="number" class="form-control col-sm-2" id="dosage" autofocus name="dose"
-                        style="width:40px" autocomplete="off" placeholder=""
-                        data-toggle="popover" data-animation="true" data-content="Enter your daily dosage in milligrams"
-                        data-trigger="hover" data-placement="bottom" disabled>
-                   <label class="conrol-label col-sm-4">Mood:</label>
-                    <select class="form-control  col-sm-2" name="mood" id="mood" data-toggle="popover"
-                        data-animation="true"  data-content="Rate your mood. Where 1 is very poor and 10 is excellent"
-                        data-trigger="hover" data-placement="bottom" disabled>
-                        <option value = "" selected disabled></option>
-                        <option value = "1">1</option>
-                        <option value = "2">2</option>
-                        <option value = "3">3</option>
-                        <option value = "4">4</option>
-                        <option value = "5">5</option>
-                        <option value = "6">6</option>
-                        <option value = "7">7</option>
-                        <option value = "8">8</option>
-                        <option value = "9">9</option>
-                        <option value = "10">10</option>
-                    </select>
-               </div>
-               <div class="form-group row ml-auto justify-content-end">
-                    <button style="width:100%" type = "button"  data-toggle="modal" data-target="#drugModal">Add / Remove medication</button>
-                </div>
-                <div class="form-group row ml-auto justify-content-end">
-                <button id="showSideEffects" style="width:100%" type = "button" data-toggle="collapse" data-target="#sideEffects"
-                    aria-expanded="false" aria-controls="sideEffects">List side effects</button>
-                </div>
-                <div id="sideEffects" class="form-group inline-form text-center drug_data" >
-                    <h6>Side Effects</h6>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="checkbox" name="fatigue"  name="Fatigue" value="Fatigue">
-                        <label class="form-check-label" for="inlineCheckbox1">Fatigue</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="checkbox" name="Weight-gain" value="Weight-gain">
-                        <label class="form-check-label" for="inlineCheckbox2">Weight-gain</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="checkbox" name="Weight-loss" value="Weight-loss">
-                        <label class="form-check-label" for="inlineCheckbox3">Weight-loss</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="checkbox" name="Headache" value="Headache">
-                        <label class="form-check-label" for="inlineCheckbox3">Headache</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="checkbox" name="Nausea" value="Nausea">
-                        <label class="form-check-label" for="inlineCheckbox3">Nausea</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="checkbox" name="Sadness" value="Sadness">
-                        <label class="form-check-label" for="inlineCheckbox3">Sadness</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="checkbox" name="Mania" value="Mania">
-                        <label class="form-check-label" for="inlineCheckbox3">Mania</label>
-                    </div>
-                </div>
-                <div class="Form-group row ml-auto justify-content-en drug_data">
-                    <button style="width:100%" type="button" id="submitAll">Update your Journey</button>
-                </div>
+            <div class="Form-group row ml-auto justify-content-en drug_data">
+                <button class="shadow-none" style="width:100%" type="button" id="submitAll">Update your Journey</button>
             </div>
         </div>
     </div>
@@ -177,102 +103,199 @@
 
     $(document).ready(function() {
 
+        var today = new Date();
+        $('#myDatepicker').datepicker({ dateFormat: 'DD, dd M yy', endDate: "today", maxDate: today}).val();
+        $('#myDatepicker').datepicker('setDate', today);
         getsetState();
 
-
+        // this needs to be moved into the html
         $('button').addClass("shadow-none")
-
-        $('#drugdata').on('show.bs.collapse', function () {
-            $("#showDrugdata").html("Cancel");
-            console.log("shown")
-        })
-
-        $('#drugdata').on('hide.bs.collapse', function () {
-            $("#showDrugdata").html("Track medication");
-            console.log("hidden")
-        })
-
-
 
         $("#myDatepicker").change(function(){
             getsetState();
         })
 
+        $("#mood").on("input", function() {
+            $("#moodValue").addClass("moodChosen")
+            $("#moodValue").html("Overall mood: " + ($("#mood").val()))
+        })
+
 
         $('#submitAll').on("click", function(event) {
             event.preventDefault()
-            // Get some values from elements on the page:
-            var date = $("[name='date']").val()
-            var drug = $("[name='drug']").val()
-            var dose = $("[name='dose']").val()
-            var mood = $("[name='mood']").val()
-            var journal = $("[name='journal']").val()
-            var side_effects_array =[]
-            $("input:checkbox:checked").each(function(){
-                side_effects_array.push($(this).val());
-            });
-            var side_effects = side_effects_array.join()
-            var data = { date: date, drug: drug, dose: dose,  mood: mood, side_effects: side_effects}
 
+            // check validation
+            validate();
+
+            // get all the data
+            data = getUserData();
+
+            // post the data to the backend to either updata or insert into database
             $.post("/posttaperdata", data, function(data){
             }).done(function(){
                 $(location).attr('href',"/");
             }).fail(function(xhr, status, error) {
                 alert("error")
             });
-            $.post("/postjournal", {journal: journal, date: date}, function(data){
-            }).done(function(){
-            }).fail(function(xhr, status, error) {
-                alert("error")
-            });
+            $("tbody").html(" ");
         });
 
         $(function () {
             $('[data-toggle="popover"]').popover()
         })
-
-
-        document.getElementById("drug").addEventListener("change",function (){
-            if ($("#drug").val() == "None") {
-                $("#dosage").prop('disabled', true);
-                $("#mood").prop('disabled',true)
-                $("#dosage").val("");
-                $("#mood").val("");
-            }
-            else {
-                $("#dosage").prop('disabled', false);
-                $("#mood").prop('disabled',false)
-                $("#dosage").prop('required', true);
-                $("#mood").prop('required', true)
-                getsetState();
-            }
-        })
     });
 
     function getsetState() {
+        $('tbody').html(" ")
         $.post("/gettaperdata",{date: $("#myDatepicker").val()}, function(data) {
         }).done(function(data){
             updateFields(data)
         }).fail(function(xhr, status, error) {alert(error)});
-        $.post("/getjournal", {date: $("#myDatepicker").val()}, function(data) {
+
+        /*$.post("/getjournal", {date: $("#myDatepicker").val()}, function(data) {
         }).done(function(data){
         $("textarea").html(data.journal)
-        }).fail(function(xhr, status, error) { alert(error)});
+        }).fail(function(xhr, status, error) { alert(error)});*/
     }
 
     function updateFields(data) {
+
+        $.post("/getdrugoptionslist", function(options_data){
+
+        }).done(function(options_data){
+            $(".drugOptionCheckboxes").children().remove();
+            buildDrugOptionsList(options_data.options)
+            if (data.drugs != "None") {
+                $('#summaryTable').html(getDrugDetailsHTML(data.drugs.split(","), data.doses.split(",")))
+            } else if (data.latest_drugs !="None") {
+                drugs_arr = data.latest_drugs.split(",")
+                $('#summaryTable').html(getDrugDetailsHTML(drugs_arr, Array(drugs_arr.length).join(".").split(".")))
+            } else {
+                $('#summaryTable').html("<tr><td>You have not tracked any medications yet. Click Add/Remove buttom to start</td></tr>");
+            }
+            $(".drugName").each(function(){
+                $("#option" + $(this).html()).parent().remove();
+            });
+        }).fail(function(xhr, status, error) {alert(error)});
+
         let side_effects_array = data.side_effects.split(",")
-        $('input:checkbox').removeAttr('checked');
-        $("#drug").val(data.drug);
+        $("#trackDrugsModal .modal-header").html(data.date)
+        $("#journalModal .modal-header").html(data.date)
+        $("#drug").val(data.drugs);
         $("#dosage").val(data.dose);;
-        $("#modal-title").html(data.date);
         $("#mood").val(data.mood);
-        console.log("testing")
-        for (let i=0; i<side_effects_array.length; i++) {
-            console.log(side_effects_array)
-            document.getElementsByName(side_effects_array[i])[0].checked = true;
+        $("#journal").val(data.journal);
+
+        $("#sideEffectOptions input[type='checkbox']").prop("checked", false)
+        if (data.side_effects == "") {
+            sideEffectsSelected = [];
+        } else {
+            sideEffectsSelected = data.side_effects.split(",")
+        }
+        for (let i=0; i<sideEffectsSelected.length; i++) {
+            document.getElementById("option" + sideEffectsSelected[i]).checked = true;
+        }
+        $(function () {
+            $('[data-toggle="popover"]').popover()
+        })
+    }
+
+    function getDrugDetailsHTML(drugs, doses) {
+
+        const drugs_array = drugs;
+        const doses_array = doses;
+        console.log (drugs_array)
+        const drugInputAttr = " type='number' class='form-control form-control-sm dose'  name='dose' style='width:80px' placeholder='' ";
+        const drugInputPopover = " data-toggle='popover' data-animation='true' data-content='Enter your daily dosage in milligrams' data-trigger='hover' data-placement='right' ";
+        const removeButton = " <td><button class='shadow-none' style='padding: 0px 10px' onclick='removeDrug(this)'>X</td> "
+        let drugsInnerHTML = "";
+        for (let i = 0; i < drugs_array.length; i++) {
+            const drugInput = "<td><input  id='dose" + drugs_array[i] + "' value ='" + doses_array[i] + "' " + drugInputAttr + drugInputPopover +  "></td>";
+            drugsInnerHTML += "<tr><td class='drugName' id=" + drugs_array[i] + ">" + drugs_array[i] + "</td>" + drugInput + removeButton + "</tr>";
+        }
+        return "<thead><tr><th>Medicine</th><th>Dose</th></tr></thead><tbody> " + drugsInnerHTML + " </tbody>";
+    }
+
+
+    function getUserData() {
+        // Get some values from elements on the page:
+        var date = $("[name='date']").val()
+        var drugs = [];
+        var doses = [];
+        $(".drugName").each(function(){
+            drugs.push($(this).html())
+        })
+        $("[name='dose'").each(function(){
+            doses.push($(this).val())
+        })
+        drugs = drugs.join();
+        doses = doses.join();
+
+        // TODO : only save the mood if the user has set it i.e. check if the class is applied.
+        var mood = Math.round($("[name='mood']").val())
+        var journal = $("[name='journal']").val()
+        var side_effects_array =[]
+        $("input[name='side_effect']:checkbox:checked").each(function(){
+            side_effects_array.push($(this).val());
+        });
+        var side_effects = side_effects_array.join()
+        var data = { date: date, drugs: drugs, doses: doses,  mood: mood, side_effects: side_effects, journal:journal}
+        return data;
+    }
+
+    function validate() {
+    }
+
+    function addCheckbox(_id, _label, _appendToId){
+    }
+
+
+
+
+
+    function updateDrugOptions () {
+        // re-render the list of drugs being tracked
+
+
+        $("input[name='drugOption']:checkbox:checked").each(function(){
+            myID = $(this).attr("id").replace("option", "");
+            if (!document.getElementById(myID)) {
+                // add drugs to list
+                const drugInputAttr = " type='number' class='form-control form-control-sm dose'  name='dose' style='width:80px' placeholder='' ";
+                const drugInputPopover = " data-toggle='popover' data-animation='true' data-content='Enter your daily dosage in milligrams' data-trigger='hover' data-placement='right' ";
+                const drugInput = "<td><input  id='dose" + myID + "' value ='" + "" + "' " + drugInputAttr + drugInputPopover +  "></td>";
+                const removeButton = " <td><button class='shadow-none' style='padding: 0px 10px' onclick='removeDrug(this)'>X</td> "
+                const drugsInnerHTML = "<tr><td class='drugName' id=" + myID + ">" + myID + "</td>" + drugInput + removeButton +"</tr>";
+
+                $("#drugEntry tbody").append(drugsInnerHTML);
+            }
+            $(this).parent().remove()
+        })
+    }
+
+    function removeDrug(el) {
+        drug =  $(el).parent().parent().children(".drugName").html()
+        id = "option" + drug;
+        $(el).parent().parent().remove();
+        // add back to list of checkboxes
+        inputHTML = "<input class='form-check-input' type='checkbox' name='drugOption' id ='" + id +"' value = '"+ drug + "' > ";
+        labelHTML= " <label class='form-check-label' for = '" + id + "' >" + drug + "</label> ";
+        checkboxHTML = "<div class='form-check form-check-inline'>" + inputHTML + labelHTML + " </div>";
+        $(".drugOptionCheckboxes").append(checkboxHTML)
+
+    }
+
+    function buildDrugOptionsList(list) {
+        for (let i = 0; i < list.length; i++) {
+            id = "option" + list[i];
+            drug= list[i];
+            inputHTML = "<input class='form-check-input' type='checkbox' name='drugOption' id ='" + id +"' value = '"+ drug + "' > ";
+            labelHTML= " <label class='form-check-label' for = '" + id + "' >" + drug + "</label> ";
+            checkboxHTML = "<div class='form-check form-check-inline'>" + inputHTML + labelHTML + " </div>";
+            $(".drugOptionCheckboxes").append(checkboxHTML)
         }
     }
+
 
 </script>
 {% endblock %}
