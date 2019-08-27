@@ -3,25 +3,32 @@
 <div  class="modal" id="trackDrugsModal" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <div class="modal-header" style="z-index:30"></div>
+            <div class="modal-header" style="z-index:30"><div id="headerDate"></div>
+                <button id="journalButton" class="shadow-none" type="button" data-toggle="modal" data-target="#journalModal" data-backdrop="static" keyboard=false>Journal</button>
+            </div>
             <div class="modal-body">
                 <div id= "drugEntry">
-                    <table id="summaryTable" style="width: 50%">
+                    <table id="summaryTable" style="width: 50%" data-toggle="popover"
+                        data-animation="true"  data-content="Specify dosages in mg. If you remove a medicine, your previous entries won't be lost!"
+                        data-trigger="hover" data-placement="right" disabled>
                         <thead><tr><th>Medication</th><th>Dose</th></tr></thead>
                         <tbody></tbody>
                     </table>
                     <br>
-                    <div class = "btn-group pull-right">
-                        <button class="shadow-none" type="button" id="manageDrugs" style = "padding: 0px 20px" class=""
+                    <div class = "" data-toggle="popover"
+                        data-animation="true"  data-content="Add medications. Soon you will be able to add customized medicatins and substances."
+                        data-trigger="hover" data-placement="bottom" disabled>
+                        <button class="shadow-none" type="button" id="manageDrugs" style = "padding: 0px 20px"
                         data-toggle="collapse" data-target="#drugOptions">Add</button>
                     </div>
+
                     <div class="collapse" id="drugOptions">
                         <hr>
                         <div class="form-group inline-form text-center drugOptionCheckboxes" ></div>
                         <button class="shadow-none"onclick = "updateDrugOptions()">Confirm</button>
                     </div>
                     <hr>
-                    <div id="sideEffectOptions" class="form-group inline-form text-center drug_data" >
+                    <div id="sideEffectOptions" class="form-group text-center drug_data" >
                         <h6>Side Effects</h6>
                         {% for side_effect in pageData.side_effect_options %}
                         <div class="form-check form-check-inline">
@@ -44,8 +51,8 @@
             <div class="modal-footer">
 
                 <div class = "btn-group pull-left">
-                    <button class="shadow-none" type="button" style = "width: 200px; float: left" class=""
-                    data-dismiss="modal" aria-label="Close">Save</button>
+                    <button class="shadow-none" type="button"  class=""
+                    data-dismiss="modal" aria-label="Save">Update journey</button>
                 </div>
             </div>
         </div>
@@ -54,18 +61,21 @@
 <div  class="modal" id="journalModal" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <div class="modal-header" style="z-index:30" id="journal_modal-title"></div>
+            <div class="modal-header" style="z-index:30"><div  id="journal_modal-title"></div></div>
             <div class="modal-body">
+                <div onclick="saveJournal()" class="iconLink pull-right"><i class="far fa-save"></i>save</div><div onclick="deleteJournal()" class="iconLink pull-right"><i class="far fa-trash-alt"></i>delete</div>
                 <textarea class="form-control" id="journal" value="" name="journal" style="height:50vh" value="" autofocus></textarea>
             </div>
             <div class="modal-footer">
-                <div class = "btn-group pull-left">
-                    <button class="shadow-none" type="button" style = "width: 200px; float: left" class=""
+                <div class = "btn-group pull-left" data-toggle="popover"
+                        data-animation="true"  data-content="Changes will are not saved atoamatically. Click here to discard the changes"
+                        data-trigger="hover" data-placement="bottom" disabled>
+                    <button class="shadow-none" type="button"  id="journalDiscard"
                     data-dismiss="modal" aria-label="Close">Discard changes</button>
                 </div>
-                <div class = "btn-group pull-right">
-                    <button class="shadow-none" type="button" id="saveJournal" style = "width: 100px" class=""
-                    data-dismiss="modal" aria-label="Save">Save</button>
+                <div class = "btn-group pull-left">
+                    <button class="shadow-none" type="button"
+                    data-dismiss="modal" aria-label="Close" id="journalSaveExit">Save and exit</button>
                 </div>
             </div>
         </div>
@@ -83,10 +93,6 @@
         <div style="width: 400px; margin: 0px auto">
             <div class ="form-group row ml-auto justify-content-right">
                 <input id="myDatepicker" class = "form-control form-control-lg" name="date" autocomplete="off" >
-            </div>
-
-            <div class="form-group row ml-auto justify-content-end">
-                <button  class="shadow-none" type = "button" style="width:100%" data-toggle="modal" data-target="#journalModal">Write in journal</button>
             </div>
             <div class="form-group row ml-auto justify-content-end">
                 <button  class="shadow-none" id="showDrugdata" style="width:100%" type = "button" data-toggle="modal" data-target="#trackDrugsModal">Track medication</button>
@@ -119,6 +125,80 @@
             $("#moodValue").addClass("moodChosen")
             $("#moodValue").html("Overall mood: " + ($("#mood").val()))
         })
+
+        $("#journalButton").on("click",  function(){
+            $('#trackDrugsModal').modal('hide');
+        });
+
+        $('#journalModal').on('show.bs.modal', function () {
+            // Load up a new modal...
+            $('#trackDrugsMdal').modal('hide')
+        })
+
+        // revert back to most recently saved journal
+         $(document).on("click", "#journalDiscard",  function() {
+            console.log("You the discard journal route")
+            $.post("/getjournal",  {date: $("#myDatepicker").val()},function(journal){
+
+            }).done(function(journal){
+                $("#journalModal textarea").val(journal)
+                $('#trackDrugsModal').modal('show');
+            }).fail(function(xhr, status, error) {
+                alert("error")
+            });
+        });
+
+        $(document).on("click", "#journalDelete",  function() {
+            console.log("You the delete journal route")
+            $.post("/postjournal",  {date: $("#myDatepicker").val(), journal: ""},function(){
+
+            }).done(function(){
+                $("#journalModal textarea").val("")
+                $('#trackDrugsModal').modal('show');
+            }).fail(function(xhr, status, error) {
+                alert("error")
+            });
+        });
+
+
+
+
+
+        $(document).on("click", "#journalSaveExit",  function(){
+            //save the contents to the backend
+            console.log("You the save and exit journal route")
+            console.log($("textarea").val())
+            $.post('/postjournal', {date: $("#myDatepicker").val(), journal: $("#journalModal textarea").val()}, function() {
+
+            }).done(function(){
+                // close the modal
+                $('#trackDrugsModal').modal('show');
+            }).fail(function(xhr, status, error) {
+                alert("error")
+            });
+        });
+
+        $(document).on("click", "#trackDrugsModal #journalButton",  function(){
+            //save the contents to the backend
+            console.log("You on the get journal route")
+            console.log($("textarea").val())
+            $.post('/getjournal', {date: $("#myDatepicker").val()}, function(journal) {
+
+            }).done(function(journal){
+                $("#journalMoadal textarea").html(journal);
+                $('#journalModal').modal('show');
+            }).fail(function(xhr, status, error) {
+                alert("error")
+            });
+        });
+
+        $('#trackDrugsModal').on('show.bs.modal', function () {
+            // Load up a new modal...
+            $('#journalModal').modal('hide')
+        })
+
+
+
 
 
         $('#submitAll').on("click", function(event) {
@@ -179,8 +259,8 @@
         }).fail(function(xhr, status, error) {alert(error)});
 
         let side_effects_array = data.side_effects.split(",")
-        $("#trackDrugsModal .modal-header").html(data.date)
-        $("#journalModal .modal-header").html(data.date)
+        $("#trackDrugsModal .modal-header #headerDate").html(data.date)
+        $("#journal_modal-title").html(data.date)
         $("#drug").val(data.drugs);
         $("#dosage").val(data.dose);;
         $("#mood").val(data.mood);
@@ -295,6 +375,27 @@
             $(".drugOptionCheckboxes").append(checkboxHTML)
         }
     }
+
+
+    function deleteJournal() {
+            $.post("/postjournal",  {date: $("#myDatepicker").val(), journal: ""},function(){
+            }).done(function(){
+                $("#journalModal textarea").html("")
+            }).fail(function(xhr, status, error) {
+                alert("error")
+            });
+        }
+
+        function saveJournal() {
+            $.post('/postjournal', {date: $("#myDatepicker").val(), journal: $("#journalModal textarea").val()}, function() {
+            }).done(function(){
+            }).fail(function(xhr, status, error) {
+                alert("error")
+            });
+        }
+
+
+
 
 
 </script>

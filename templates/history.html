@@ -1,0 +1,72 @@
+{% extends "layout.html" %}
+
+{% block main %}
+
+<div id="historyContainer">
+    <div class="wrapper">
+        <h3 class="font-weight-light" >Your taper journey up to now</h3>
+        <div id="borderContainer">
+            <div class="container">
+                <div>
+                    <i style = "margin-right: 10px" class="far fa-calendar-alt"></i>
+                    <select id="drugNames" value="">
+                        <option name="drugName" id="All">All</option>
+                        {% for drug in drugNames %}
+                        <option name="drugName" id={{drug}} > {{ drug }} </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <i class="far fa-edit"  id="showDrugdata" data-toggle="modal" data-target="#trackDrugsModal"></i>
+            </div>
+            <table id="historyTable" class="table table-hover">
+                <thead>
+                    <tr>
+                        <th  class="text-left">Date</th>
+                        <th class="text-center">Medication</th>
+                        <th class="text-right">Dosage</th>
+                        <th class="text-right">Mood</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for i in range(page_data|length) %}
+                    <tr onMouseOver="this.style.backgroundColor='rgba(242, 95,105, 0.4)'"
+                        onMouseOut="this.style.backgroundColor='transparent'" >
+                        <td>{{ page_data[i].date }} </th>
+                        <td align="center">{{ page_data[i].drug }}</td>
+                        <td align="right">{{ page_data[i].dose}} mg</td>
+                        <td align="right">{{ page_data[i].mood }}/10</td>
+                        <td><button class="shadow-none">X</button ></td>
+                    </tr>
+                    {% endfor %}
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+
+<script language="javascript" type="text/javascript">
+
+    $(document).ready(function() {
+
+        $("select").on("change", function (e) {
+
+            let valueSelected = e.target.value;
+            console.log(valueSelected)
+            $.post("/history", {"Value": valueSelected}, function(responese){
+
+            }).done(function(response){
+                var myDiv = $("#historyContainer")
+                $("body").html(response)
+                $("select").val(valueSelected)
+            })
+        })
+
+    })
+</script>
+
+
+{% endblock %}

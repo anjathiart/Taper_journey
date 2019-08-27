@@ -10,7 +10,7 @@ from werkzeug.exceptions import default_exceptions, HTTPException, InternalServe
 from werkzeug.security import check_password_hash, generate_password_hash
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 
-from helpers import apology, signin_required
+from helpers import apology, signin_required, copyf
 
 
 # Configure application
@@ -48,28 +48,120 @@ def index():
     if not db.execute("SELECT * FROM entries WHERE user_id=?", session["user_id"]):
         return redirect ("/taper")
     else:
-
         #initialise drugInfo for day | date | object: drug, dose | mood |journal
         drugInfo = [];
         # get the info for the latest entry date
         row = db.execute("SELECT * FROM entries WHERE user_id=? ORDER BY entry_date DESC", session["user_id"])
         dateHTML = datetime.strptime(row[0]["entry_date"], "%Y-%m-%d").strftime("%A, %d %b %Y")
-        print(f"{row}")
+        print(f"{dateHTML}")
         if row[0]["drugs"] != "NULL":
             drugs = row[0]["drugs"].split(",")
             doses = row[0]["doses"].split(",")
         side_effects = row[0]["side_effects"]
         mood = row[0]["mood"]
-        journal = row[0]["journal"]
 
-        print(f"list of drugs: {drugs}")
+        # find latest journal entry
+        if not row[0]["journal"]:
+            row2 = db.execute("SELECT journal, entry_date From entries WHERE user_id=? AND journal IS NOT NULL ORDER BY entry_date DESC" , (session["user_id"]))
+            if not row2:
+                journal: ""
+            else:
+                journal =row2[0]["journal"]
+                journal_date = row2[0]["entry_date"]
+        else:
+            journal = row[0]["journal"]
+            journal_date = row[0]["entry_date"]
+
         for i in range(len(drugs)):
             drugEntry = {"drug":  drugs[i], "dose": doses[i]}
-            print(f"{drugEntry}")
             drugInfo.append(drugEntry)
-        print(f"{drugInfo}")
-        data = {"date": dateHTML, "drugInfo": drugInfo, "mood": mood, "side_effedts": side_effects, "journal": journal }
-        return render_template("home.html", data=data)
+
+        drug_options = ["Cymbalta", "Epitec", "Abilify", "Ivedel"]
+        side_effect_options = ["Fatigue", "Nausea", "Headache", "Weigt-gain", "Weight-los", "Mania", "Insomnia"]
+        pageData = {"drug_options": drug_options, "side_effect_options": side_effect_options}
+
+        data = {"date": dateHTML, "drugInfo": drugInfo, "mood": mood, "side_effedts": side_effects, "side_effect_options": side_effect_options, "drug_options":drug_options,  "journal": journal, "journal_date": journal_date,"pageData": pageData}
+        print(f"{data}")
+        return render_template("home.html", page_data=data)
+
+
+@app.route("/history", methods=["GET", "POST"])
+@signin_required
+def history():
+    if not (db.execute("SELECT * FROM entries WHERE user_id = ? ORDER BY entry_date DESC", (session["user_id"]))):
+        data={"hasHistory" : "false"}
+    else:
+        rows = db.execute("SELECT * FROM entries WHERE user_id = ? ORDER BY entry_date DESC", (session["user_id"]))
+        data = []
+        all_drugs=[]
+        # loop over each row and append all the data for that row and for each drug into a temporary object then append it to the main object.
+        for row in rows:
+            temp_row = [];
+            if (row["drugs"]):
+                mood = row["mood"]
+                drugs = row["drugs"].split(",")
+                doses = row["doses"].split(",")
+                mood = row["mood"]
+                date = row["entry_date"]
+                side_effects = row["side_effects"].split(",")
+                all_drugs += drugs
+                for i in range(len(drugs)):
+                    temp_row = {"drug": drugs[i], "dose": doses[i], "mood": mood, "date": date, "side_effects": side_effects}
+                    data.append(temp_row)
+            else:
+                continue
+        if not request.form.get("Value"):
+            newList = data
+        elif request.form.get("Value") == "All":
+            newList = data
+        else:
+            newList = []
+            for entry in data:
+                if entry["drug"] == request.form.get("Value"):
+                    newList.append(entry)
+    print(f"{newList}")
+    return render_template("history.html", page_data=newList, drugNames=list(set(all_drugs)))
+
+
+@app.route("/filter")
+@signin_required
+def filter():
+    if request.method == "GET":
+        if not (db.execute("SELECT * FROM entries WHERE user_id = ? ORDER BY entry_date DESC", (session["user_id"]))):
+            data={"hasHistory" : "false"}
+        else:
+            rows = db.execute("SELECT * FROM entries WHERE user_id = ? ORDER BY entry_date DESC", (session["user_id"]))
+            data = []
+
+            # loop over each row and append all the data for that row and for each drug into a temporary object then append it to the main object.
+            for row in rows:
+                temp_row = [];
+                if (row["drugs"]):
+                    mood = row["mood"]
+                    drugs = row["drugs"].split(",")
+                    doses = row["doses"].split(",")
+                    mood = row["mood"]
+                    date = row["entry_date"]
+                    side_effects = row["side_effects"].split(",")
+                    all_drugs += drugs
+                    for i in range(len(drugs)):
+                        temp_row = {"drug": drugs[i], "dose": doses[i], "mood": mood, "date": date, "side_effects": side_effects}
+                        data.append(temp_row)
+                else:
+                    continue
+            print(f"{data}")
+
+
+        return render_template("history.html", page_data=data, drugNames=list(set(all_drugs)))
+    else:
+        return apology("TODO", 400)
+
+
+    # get what the user wants to filter on can be date or medicne or both
+
+
+
+
 
 
 @app.route("/signin", methods=["GET", "POST"])
@@ -96,7 +188,6 @@ def signin():
         session["user_id"] = rows[0]["id"]
         return redirect("/")
     else:
-        print("You are in the get signin route")
         return render_template("signin.html")
 
 
@@ -134,17 +225,17 @@ def signup():
 @app.route("/taper", methods=["GET", "POST"])
 @signin_required
 def taper():
-    if request.method == "POST":
-        drug_options = ["Cymbalta", "Epitec", "Abilify", "Ivedel"]
-        side_effect_options = ["Fatigue", "Nausea", "Headache", "Weigt-gain", "Weight-los", "Mania", "Insomnia"]
-        pageData = {"drug_options": drug_options, "side_effect_options": side_effect_options}
-        return render_template("taper.html", pageData = pageData)
-    else:
-        drug_options = ["Cymbalta","Epitec","Abilify","Ivedel"]
-        side_effect_options = ["Fatigue","Nausea","Headache","Weigt-gain","Weight-los","Mania","Insomnia"]
-        pageData = {"drug_options": drug_options, "side_effect_options": side_effect_options}
-        print(f"{pageData}")
-        return render_template("taper.html", pageData = pageData)
+    # if request.method == "POST":
+    #     drug_options = ["Cymbalta", "Epitec", "Abilify", "Ivedel"]
+    #     side_effect_options = ["Fatigue", "Nausea", "Headache", "Weigt-gain", "Weight-los", "Mania", "Insomnia"]
+    #     pageData = {"drug_options": drug_options, "side_effect_options": side_effect_options}
+    #     return render_template("taper.html", pageData = pageData)
+    # else:
+    #     drug_options = ["Cymbalta","Epitec","Abilify","Ivedel"]
+    #     side_effect_options = ["Fatigue","Nausea","Headache","Weigt-gain","Weight-los","Mania","Insomnia"]
+    #     pageData = {"drug_options": drug_options, "side_effect_options": side_effect_options}
+    #     return render_template("taper.html", pageData = pageData)
+    return apology("TODO / OUT OF DATE", 400)
 
 @app.route("/posttaperdata", methods=["POST"])
 @signin_required
@@ -244,14 +335,21 @@ def postjournal():
 
      # data to be populated
     journal = request.form.get("journal")
+
     dateHTML = request.form.get("date")
     dateSQL = datetime.strptime(dateHTML, "%A, %d %b %Y").strftime("%Y-%m-%d")
 
-    #check if th entry already exists, if it does make a update otherwise insert it into the existing database
-    if not db.execute("SELECT drugs, entry_date FROM journals WHERE user_id = ? AND entry_date = ?", (session["user_id"], dateSQL)):
-        db.execute("INSERT INTO journals (journal_entry, user_id, entry_date) VALUES (?, ?, ?)", (journal, session["user_id"], dateSQL))
+    #check if th entry already exists, if it does make a update otherwise insert it into the existing database. If the journal is empty, set it to NULL
+    if not db.execute("SELECT * FROM entries WHERE user_id = ? AND entry_date = ?", (session["user_id"], dateSQL)):
+        if journal == "":
+            db.execute("INSERT INTO entries (journal, user_id, entry_date) VALUES (NULL, ?, ?)", (session["user_id"], dateSQL))
+        else:
+             db.execute("INSERT INTO entries (journal, user_id, entry_date) VALUES (?, ?, ?)", (journal, session["user_id"], dateSQL))
     else:
-        db.execute("UPDATE journals SET journal_entry=?, user_id=?, entry_date = ?", (journal, session["user_id"], dateSQL))
+        if journal == "":
+            db.execute("UPDATE entries SET journal=NULL WHERE user_id = ? AND entry_date=?", ( session["user_id"], dateSQL))
+        else:
+            db.execute("UPDATE entries SET journal=? WHERE user_id = ? AND entry_date=?", (journal, session["user_id"], dateSQL))
     return redirect("/")
 
 @app.route("/getjournal", methods=["POST"])
@@ -263,11 +361,12 @@ def getjournal():
     dateSQL = datetime.strptime(dateHTML, "%A, %d %b %Y").strftime("%Y-%m-%d")
 
     # check if there are journal entries
-    if not db.execute("SELECT (journal, entry_date) FROM entries WHERE user_id = ? ORDER BY entry_date DESC", (session["user_id"])):
-        return {"journal" : ""}
+    if not db.execute("SELECT journal FROM entries WHERE user_id = ? AND entry_date=? AND journal IS NOT NULL", (session["user_id"], dateSQL)):
+        return ""
     else:
-        row = db.execute("SELECT journal, entry_date FROM entries WHERE user_id = ? ORDER BY entry_date DESC", (session["user_id"]))
-        return {"journal" : row[0]["journal"]}
+        row = db.execute("SELECT journal FROM entries WHERE user_id = ? AND entry_date=?", (session["user_id"], dateSQL))
+        print(f"{row}")
+    return row[0]["journal"]
 
 @app.route("/getdrugoptionslist", methods=["POST"])
 @signin_required

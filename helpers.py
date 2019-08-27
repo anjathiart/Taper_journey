@@ -34,5 +34,6 @@ def signin_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
-
+def copyf(data, key, allowed):
+    return filter(lambda x: key in x and x[key] in allowed, data)
 
