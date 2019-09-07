@@ -46,9 +46,13 @@ body, html {
     text-shadow: 4px 4px 12px #BA3A27;
 }
 
-
 input {
     box-shadow: 0px 0px 4px gray;
+}
+
+
+#trackDrugsModal input {
+
     text-align:right;
 }
 

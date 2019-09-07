@@ -46,20 +46,33 @@ def index():
 
     # if user has not yet logged any drugs render taper page
     if not db.execute("SELECT * FROM entries WHERE user_id=?", session["user_id"]):
-        return redirect ("/taper")
+        drug_options = ["Cymbalta", "Epitec", "Abilify", "Ivedel"]
+        side_effect_options = ["Fatigue", "Nausea", "Headache", "Weigt-gain", "Weight-los", "Mania", "Insomnia"]
+        pageData = {"drug_options": drug_options, "side_effect_options": side_effect_options}
+
+        data = {"date": '', "drugInfo": [], "mood": '', "side_effedts": '', "side_effect_options": side_effect_options, "drug_options":drug_options,  "journal": '', "journal_date": ''}
+        print(f"{data}")
+        return render_template("home.html", page_data=data)
     else:
         #initialise drugInfo for day | date | object: drug, dose | mood |journal
         drugInfo = [];
         # get the info for the latest entry date
         row = db.execute("SELECT * FROM entries WHERE user_id=? ORDER BY entry_date DESC", session["user_id"])
         dateHTML = datetime.strptime(row[0]["entry_date"], "%Y-%m-%d").strftime("%A, %d %b %Y")
+        print(f"{row[0]['drugs']}")
         print(f"{dateHTML}")
-        if row[0]["drugs"] != "NULL":
+        drugs = []
+        doses=[]
+        mood = ''
+        side_effects = ''
+        if row[0]["drugs"]:
             drugs = row[0]["drugs"].split(",")
             doses = row[0]["doses"].split(",")
-        side_effects = row[0]["side_effects"]
-        mood = row[0]["mood"]
+            side_effects = row[0]["side_effects"]
+            mood = row[0]["mood"]
 
+        journal_date=''
+        journal = ''
         # find latest journal entry
         if not row[0]["journal"]:
             row2 = db.execute("SELECT journal, entry_date From entries WHERE user_id=? AND journal IS NOT NULL ORDER BY entry_date DESC" , (session["user_id"]))
@@ -285,15 +298,19 @@ def gettaperdata():
     row = db.execute("SELECT * FROM entries WHERE user_id = ? AND entry_date = ?", (session["user_id"], dateSQL))
     latest_drugs = ""
     latest_doses = ""
+    drugs = ''
+    doses = ''
+    journal = ''
+    mood = ''
     if not row:
         row = db.execute("SELECT * FROM entries WHERE user_id= ? AND drugs IS NOT NULL AND entry_date <= ? ORDER BY entry_date DESC", (session["user_id"], dateSQL))
         if not row:
-            latest_drugs = "None"
-            latest_doses = "None"
+            latest_drugs = ""
+            latest_doses = ""
         else:
             latest_drugs = row[0]["drugs"]
             latest_doses = row[0]["doses"]
-        data = {"drugs": "None", "doses": "", "mood": "", "side_effects": "", "date": dateHTML, "journal": "", "latest_drugs": latest_drugs,"latest_doses": latest_doses }
+        data = {"drugs": "", "doses": "", "mood": "", "side_effects": "", "date": dateHTML, "journal": "", "latest_drugs": latest_drugs,"latest_doses": latest_doses }
     else:
         drugs = row[0]["drugs"]
         doses = row[0]["doses"]

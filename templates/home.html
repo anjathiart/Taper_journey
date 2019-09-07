@@ -10,6 +10,9 @@
                 <button id="journalButton"  class="shadow-none"  data-toggle="modal" data-target="#journalModal" data-backdrop="static" keyboard=false>Journal</button>
             </div>
             <div class="modal-body">
+                <div id = "noDrugsTrackedPlaceHolder">
+                    <p>You are currently not tracking any medictions. Click on the add button to start</p>
+                </div>
                 <div id= "drugEntry">
                     <table id="summaryTable" style="width: 50%" data-toggle="popover"
                         data-animation="true"  data-content="Specify dosages in mg. If you remove a medicine, your previous entries won't be lost!"
@@ -99,7 +102,7 @@
         <div id="borderContainer">
             <div class="container">
                 <div><i style = "margin-right: 10px" class="far fa-calendar-alt"></i><input  id="latestDate"  autocomplete="off"></div>
-                <div style="float:right; font-style:italic">Mood: {{ page_data.mood }}/10</div>
+                <div style="float:right; font-style:italic">Mood: <span id="mood2">{{page_data.mood}}</span>/10</div>
                 <i class="far fa-edit"  id="showDrugdata" data-toggle="modal" data-target="#trackDrugsModal"></i>
             </div>
             <table id="latestSummaryTable" class="table table-hover">
@@ -258,6 +261,7 @@
         $('#trackDrugsModal tbody').html(" ")
         $.post("/gettaperdata",{date: date}, function(data) {
         }).done(function(data){
+             console.log(data)
             updateFields(data)
         }).fail(function(xhr, status, error) {alert(error)});
 
@@ -274,32 +278,37 @@
         }).done(function(options_data){
             $(".drugOptionCheckboxes").children().remove();
             buildDrugOptionsList(options_data.options)
-            if (data.drugs != "None") {
+            if (data.drugs) {
                 $('#summaryTable').html(getDrugDetailsHTML(data.drugs.split(","), data.doses.split(",")))
-            } else if (data.latest_drugs !="None") {
+            } else if (data.latest_drugs) {
                 drugs_arr = data.latest_drugs.split(",")
                 $('#summaryTable').html(getDrugDetailsHTML(drugs_arr, Array(drugs_arr.length).join(".").split(".")))
             } else {
-                $('#summaryTable').html("<tr><td>You have not tracked any medications yet. Click Add/Remove buttom to start</td></tr>");
+
             }
             $(".drugName").each(function(){
                 $("#option" + $(this).html()).parent().remove();
             });
         }).fail(function(xhr, status, error) {alert(error)});
 
-        let side_effects_array = data.side_effects.split(",")
+        let side_effects_array = []
+        if (data.side_effects) {
+            side_effects_array = data.side_effects.split(",")
+        }
+
         $("#trackDrugsModal .modal-header #myDatepicker").val(data.date)
         $("#journal_modal-title").html(data.date)
         $("#drug").val(data.drugs);
         $("#dosage").val(data.dose);;
-        $("#mood").val(data.mood);
+        $("#mood2").val("test")
         $("#journal").val(data.journal);
 
         $("#sideEffectOptions input[type='checkbox']").prop("checked", false)
-        if (data.side_effects == "") {
-            sideEffectsSelected = [];
-        } else {
+        if (data.side_effects) {
             sideEffectsSelected = data.side_effects.split(",")
+        } else {
+            console.log ("trying to split second side-effects NULL")
+            sideEffectsSelected = [];
         }
         for (let i=0; i<sideEffectsSelected.length; i++) {
             document.getElementById("option" + sideEffectsSelected[i]).checked = true;
