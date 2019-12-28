@@ -57,7 +57,7 @@
             <div class="modal-footer">
 
                 <div class = "btn-group pull-left">
-                    <button class="shadow-none" type="button"  class=""
+                    <button class="shadow-none" type="button"  id="submitAll"
                     data-dismiss="modal" aria-label="Save">Update journey</button>
                 </div>
             </div>
@@ -233,13 +233,14 @@
             $('#journalModal').modal('hide')
         })
 
-        $('#submitAll').on("click", function(event) {
+        $(document).on("click", "#submitAll", function(event) {
             event.preventDefault()
 
             // check validation
             validate();
 
             // get all the data
+            let data = {};
             data = getUserData();
 
             // post the data to the backend to either updata or insert into database
@@ -337,7 +338,7 @@
 
     function getUserData() {
         // Get some values from elements on the page:
-        var date = $("[name='date']").val()
+        var date = $("#myDatepicker").val();
         var drugs = [];
         var doses = [];
         $(".drugName").each(function(){

@@ -259,6 +259,7 @@ def posttaperdata():
 
     #parse the date
     dateFormatted = request.form.get("date")
+    print(f"{dateFormatted}")
     date = datetime.strptime(dateFormatted, "%A, %d %b %Y").strftime("%Y-%m-%d")
 
     drugs = request.form.get('drugs')
