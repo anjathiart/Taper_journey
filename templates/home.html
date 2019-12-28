@@ -97,14 +97,19 @@
 
 <div class="split right" id="latestData">
     <div class="wrapper">
-        <h3 style="margin-bottom: 0px" class="font-weight-light" >Journey Status</h3>
+        <h3 style="margin-bottom: 10px" class="font-weight-light" >Journey Status</h3>
         <h6 class="push-right" style="font-style:italic; margin-left: 60px">Latest update:</h6>
         <div id="borderContainer">
             <div class="container">
                 <div><i style = "margin-right: 10px" class="far fa-calendar-alt"></i><input  id="latestDate"  autocomplete="off"></div>
-                <div style="float:right; font-style:italic">Mood: <span id="mood2">{{page_data.mood}}</span>/10</div>
+                <div style="font-style:italic">Mood: <span id="mood2">{{page_data.mood}}</span>/10</div>
                 <i class="far fa-edit"  id="showDrugdata" data-toggle="modal" data-target="#trackDrugsModal"></i>
+                <!--  -->
             </div>
+            <div class="containter">
+                <div align=center style="margin-bottom: 10px" ><em style="margin-right: 10px">Side-effects:</em>{{ page_data.side_effects | replace(",", ", ") }}</div>
+            </div>
+
             <table id="latestSummaryTable" class="table table-hover">
                 <thead>
                     <tr>
@@ -125,7 +130,7 @@
         </div>
         {% if page_data.journal != "" %}
         <div id = "journalContainer" style="padding-right:20px; margin-right:30px">
-            <h4 class="font-weight-light">Journal</h4>
+            <h4 class="font-weight-light" style="margin-right: 10px">Journal</h4>
             <p>{{ page_data.journal_date }}</p>
         </div>
         <p id="journal_b" class="no-wrap">{{ page_data.journal }}</p>

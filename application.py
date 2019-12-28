@@ -54,7 +54,7 @@ def index():
         print(f"{data}")
         return render_template("home.html", page_data=data)
     else:
-        #initialise drugInfo for day | date | object: drug, dose | mood |journal
+        #initialise drugInfo for day | date | object: drug, dose | mood |journal | side_effects
         drugInfo = [];
         # get the info for the latest entry date
         row = db.execute("SELECT * FROM entries WHERE user_id=? ORDER BY entry_date DESC", session["user_id"])
@@ -93,7 +93,7 @@ def index():
         side_effect_options = ["Fatigue", "Nausea", "Headache", "Weight-gain", "Weight-los", "Mania", "Insomnia"]
         pageData = {"drug_options": drug_options, "side_effect_options": side_effect_options}
 
-        data = {"date": dateHTML, "drugInfo": drugInfo, "mood": mood, "side_effedts": side_effects, "side_effect_options": side_effect_options, "drug_options":drug_options,  "journal": journal, "journal_date": journal_date,"pageData": pageData}
+        data = {"date": dateHTML, "drugInfo": drugInfo, "mood": mood, "side_effects": side_effects, "side_effect_options": side_effect_options, "drug_options":drug_options,  "journal": journal, "journal_date": journal_date,"pageData": pageData}
         print(f"{data}")
         return render_template("home.html", page_data=data)
 

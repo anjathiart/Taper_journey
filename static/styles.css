@@ -135,6 +135,7 @@ label.col-sm-2.right-label {
 
 .submit-button {
     float: left;
+    box-shadow: none;
 }
 
 
@@ -347,7 +348,7 @@ div .iconLink {
 }
 
 #historyContainer h3 {
-    color: rgba(242, 95,105, 1);
+
 }
 
 .wrapper {
@@ -399,16 +400,10 @@ div .iconLink {
 
 
 
-#journalPageContainer h6 {
-    color: rgba(242, 95,105, 1);
-}
 
-#journalPageContainer h3 {
-    color: rgba(242, 95,105, 1);
-}
 
 #journalPageContainer h6 {
-    color: rgba(242, 95,105, 0.8);
+    color: rgba(242, 95,105, 1);
     font-size: 0.85rem;
 }
 
