@@ -69,7 +69,16 @@
         <div class="modal-content">
             <div  style="z-index:30"><div class="modal-header"  id="journal_modal-title"></div></div>
             <div class="modal-body">
-                <div onclick="saveJournal()" class="iconLink pull-right"><i class="far fa-save"></i>save</div><div onclick="deleteJournal()" class="iconLink pull-right"><i class="far fa-trash-alt"></i>delete</div>
+                <div>
+                    <div onclick="saveJournal()" class="iconLink pull-right" style="display: flex; align-items:center; font-size: 0.8rem">
+                        <i class="far fa-save"></i>
+                        <span style="margin-left: 5px">Save</span>
+                    </div>
+                    <div onclick="deleteJournal()" class="iconLink pull-right" style="display: flex; align-items:center; font-size: 0.8rem; margin-left: 20px">
+                        <i class="far fa-trash-alt"></i>
+                        <span style="margin-left: 5px">Delete</span>
+                    </div>
+                </div>
                 <textarea class="form-control" id="journal" value="" name="journal" style="height:50vh" value="" autofocus></textarea>
             </div>
             <div class="modal-footer">
