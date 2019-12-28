@@ -8,7 +8,7 @@
         <div id="borderContainer">
             <div class="container">
                 <div>
-                    <i style = "margin-right: 10px" class="far fa-calendar-alt"></i>
+                    <i style = "margin-right: 10px" class="fas fa-filter"></i><span style="margin-right: 10px">Medication:</span>
                     <select id="drugNames" value="">
                         <option name="drugName" id="All">All</option>
                         {% for drug in drugNames %}
@@ -16,7 +16,7 @@
                         {% endfor %}
                     </select>
                 </div>
-                <i class="far fa-edit"  id="showDrugdata" data-toggle="modal" data-target="#trackDrugsModal"></i>
+                <!-- <i class="far fa-edit"  id="showDrugdata" data-toggle="modal" data-target="#trackDrugsModal"></i>-->
             </div>
             <table id="historyTable" class="table table-hover">
                 <thead>
@@ -24,8 +24,9 @@
                         <th  class="text-left">Date</th>
                         <th class="text-center">Medication</th>
                         <th class="text-right">Dosage</th>
+                        <th class="text-center">Side-effects</th>
                         <th class="text-right">Mood</th>
-                        <th></th>
+                       <!-- <th></th> -->
                     </tr>
                 </thead>
                 <tbody>
@@ -35,8 +36,14 @@
                         <td>{{ page_data[i].date }} </th>
                         <td align="center">{{ page_data[i].drug }}</td>
                         <td align="right">{{ page_data[i].dose}} mg</td>
+                        <td align="center">
+                            {% for se in page_data[i].side_effects %}
+                            {{ se }}
+                            {{ ", " if not loop.last }}
+                            {% endfor %}
+                            </td>
                         <td align="right">{{ page_data[i].mood }}/10</td>
-                        <td><button class="shadow-none">X</button ></td>
+                        <!-- <td><button class="shadow-none">X</button ></td> -->
                     </tr>
                     {% endfor %}
 
