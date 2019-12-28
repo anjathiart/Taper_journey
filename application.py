@@ -47,7 +47,7 @@ def index():
     # if user has not yet logged any drugs render taper page
     if not db.execute("SELECT * FROM entries WHERE user_id=?", session["user_id"]):
         drug_options = ["Cymbalta", "Epitec", "Abilify", "Ivedel"]
-        side_effect_options = ["Fatigue", "Nausea", "Headache", "Weigt-gain", "Weight-los", "Mania", "Insomnia"]
+        side_effect_options = ["Fatigue", "Nausea", "Headache", "Weight-gain", "Weight-los", "Mania", "Insomnia"]
         pageData = {"drug_options": drug_options, "side_effect_options": side_effect_options}
 
         data = {"date": '', "drugInfo": [], "mood": '', "side_effedts": '', "side_effect_options": side_effect_options, "drug_options":drug_options,  "journal": '', "journal_date": ''}
@@ -90,7 +90,7 @@ def index():
             drugInfo.append(drugEntry)
 
         drug_options = ["Cymbalta", "Epitec", "Abilify", "Ivedel"]
-        side_effect_options = ["Fatigue", "Nausea", "Headache", "Weigt-gain", "Weight-los", "Mania", "Insomnia"]
+        side_effect_options = ["Fatigue", "Nausea", "Headache", "Weight-gain", "Weight-los", "Mania", "Insomnia"]
         pageData = {"drug_options": drug_options, "side_effect_options": side_effect_options}
 
         data = {"date": dateHTML, "drugInfo": drugInfo, "mood": mood, "side_effedts": side_effects, "side_effect_options": side_effect_options, "drug_options":drug_options,  "journal": journal, "journal_date": journal_date,"pageData": pageData}
@@ -101,7 +101,7 @@ def index():
 @app.route("/history", methods=["GET", "POST"])
 @signin_required
 def history():
-    if not (db.execute("SELECT * FROM entries WHERE user_id = ? ORDER BY entry_date DESC", (session["user_id"]))):
+    if not (db.execute("SELECT journal, entry_date FROM entries WHERE user_id = ? ORDER BY entry_date DESC", (session["user_id"]))):
         data={"hasHistory" : "false"}
     else:
         rows = db.execute("SELECT * FROM entries WHERE user_id = ? ORDER BY entry_date DESC", (session["user_id"]))
@@ -134,6 +134,20 @@ def history():
                     newList.append(entry)
     print(f"{newList}")
     return render_template("history.html", page_data=newList, drugNames=list(set(all_drugs)))
+
+# send all the journal entries to the journal blog page
+@app.route("/journal", methods=["GET", "POST"])
+@signin_required
+def journal():
+    if not (db.execute("SELECT journal, entry_date From entries WHERE user_id=? AND journal IS NOT NULL ORDER BY entry_date DESC" , (session["user_id"]))):
+        journal_data={"hasJournalEntries" : "false"}
+    else:
+        rows = db.execute("SELECT journal, entry_date From entries WHERE user_id=? AND journal IS NOT NULL ORDER BY entry_date DESC" , (session["user_id"]))
+        journal_data = []
+        for row in rows:
+            journal_data.append({"date": row["entry_date"], "entry": row["journal"]})
+
+        return render_template("journal.html", page_data=journal_data)
 
 
 @app.route("/filter")

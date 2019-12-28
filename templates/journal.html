@@ -1,0 +1,43 @@
+{% extends "layout.html" %}
+
+{% block main %}
+
+<div id="journalPageContainer">
+    <div class="wrapper">
+        <h3 class="font-weight-light" >Your journal posts</h3>
+        <div id="borderContainer">
+            {% for entry in page_data %}
+            <div class="journalEntryCard">
+                <i><h6> {{ entry.date }} </h6></i>
+                <div> {{ entry.entry }} </div>
+                <hr>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+
+
+<script language="javascript" type="text/javascript">
+
+    $(document).ready(function() {
+
+        $("select").on("change", function (e) {
+
+            let valueSelected = e.target.value;
+            console.log(valueSelected)
+            $.post("/history", {"Value": valueSelected}, function(responese){
+
+            }).done(function(response){
+                var myDiv = $("#historyContainer")
+                $("body").html(response)
+                $("select").val(valueSelected)
+            })
+        })
+
+    })
+</script>
+
+
+{% endblock %}
