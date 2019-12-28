@@ -346,6 +346,10 @@ div .iconLink {
     padding-left: 20px;
 }
 
+#historyContainer h3 {
+    color: rgba(242, 95,105, 1);
+}
+
 .wrapper {
     border-right: 3px solid rgba(242, 95,105, 1);
 }
@@ -368,6 +372,7 @@ div .iconLink {
     font-size: 0.8em;
     text-decoration: underline;
 }
+
 
 #borderContainer {
     border-left: 4px solid lightGray;
@@ -392,12 +397,31 @@ div .iconLink {
     padding-left: 20px;
 }
 
-.journalEntryCard {
-    padding-bottom: 20px;
-}
+
 
 #journalPageContainer h6 {
     color: rgba(242, 95,105, 1);
+}
+
+#journalPageContainer h3 {
+    color: rgba(242, 95,105, 1);
+}
+
+#journalPageContainer h6 {
+    color: rgba(242, 95,105, 0.8);
+    font-size: 0.85rem;
+}
+
+.journalEntryCard {
+    border-bottom: 1px solid lightGray;
+    padding-bottom: 30px;
+    padding-top: 30px;
+    padding-right: 10px;
+    padding-left: 10px;
+}
+
+.journalEntryCard:hover {
+    background-color: rgba(242, 95,105, 0.2);
 }
 
 

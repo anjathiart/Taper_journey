@@ -7,10 +7,9 @@
         <h3 class="font-weight-light" >Your journal posts</h3>
         <div id="borderContainer">
             {% for entry in page_data %}
-            <div class="journalEntryCard">
-                <i><h6> {{ entry.date }} </h6></i>
-                <div> {{ entry.entry }} </div>
-                <hr>
+            <div align=right class="journalEntryCard">
+                <i><em><h6> {{ entry.date }} </h6></em></i>
+                <div align=left> {{ entry.entry }} </div>
             </div>
             {% endfor %}
         </div>
