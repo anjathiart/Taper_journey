@@ -9,24 +9,34 @@
     <!-- Full Page Image Header with Vertically Centered Content -->
     <header class="background signupBackground">
 
+        <div class="jumbotron">
+            <h1 class="display-4">Taper Journey <i><sup style="font-size: 4rem; font-weight:300">Beta</sup></i></h1>
+            <p class="lead main-text">A mental health tracking application brought to you by <em>Short Shift Productions Pty. Ltd.</em><sup>&copy</sup></p>
+            <hr class="my-4">
+            <p class="secondary-text">Whether or not you are on medication, tapering on to or off of medication, this app can help you along with the journey. Track your mental health journey by recording daily medication dosages, side-effects and overall mood. Use the Journal feature to write daily journal entries.</p>
+            <!--<p class="lead ">
+                <a class="btn btn-primary btn-lg" href="#" role="button">Sign Up</a>
+            </p>-->
+        </div>
+
       <div class="d-flex h-100">
-            <div class="m-auto centered-all">
+            <div class="m-auto">
                 <form action="/signup" method="POST">
                     <div class="form-group form-row">
-                        <input type="text" class="form-control  col-sm-12 username-input" id="username" autofocus name="username"
+                        <input type="text" class="form-control  col-sm-12 username-input entryPointForm" id="username" autofocus name="username"
                             placeholder="Create a username">
                     </div>
-                    <div class="form-group form-row">
+                    <!--<div class="form-group form-row">
                         <input type="email" class="form-control col-sm-12 email-input" id="email" autofocus name="email"
                             placeholder="Enter your email">
-                    </div>
+                    </div>-->
                     <div class="form-group form-row">
-                        <input type="password" class="form-control col-sm-12 password-input" id="password" autofocus name="password"
+                        <input type="password" class="form-control col-sm-12 password-input entryPointForm" id="password" autofocus name="password"
                             placeholder="Password">
                     </div>
                     <div class="form-group form-row" align="center">
-                        <input type="password" class="form-control col-sm-12 password-input" id="confrim_password" autofocus name="confirm_password"
-                            placeholder="Password">
+                        <input type="password" class="form-control col-sm-12 password-input entryPointForm" id="confrim_password" autofocus name="confirm_password"
+                            placeholder="Re-enter password">
                     </div>
                     <button type="submit" class="btn btn-secondary submit-button">Sign Up</button>
                 </form>

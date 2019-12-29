@@ -22,29 +22,37 @@
     </head>
 
     <body>
+        <div style="height: 100vh; overflow:hidden">
+            <!-- http://getbootstrap.com/docs/4.1/components/navbar/ -->
+            <nav class="navbar bg-custom navbar-expand-sm navbar-dark">
+                <a class="navbar-brand  mb-1 h1" href="/">TAPER _ journey</a>
+                <button aria-controls="navbarNav" aria-expanded="false" class="navbar-toggler" type="button" data-target="#navbarNav" data-toggle="collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/signin">Sign In</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/signup">Sign Up</a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
 
-        <!-- http://getbootstrap.com/docs/4.1/components/navbar/ -->
-        <nav class="navbar bg-custom navbar-expand-sm navbar-dark">
-            <a class="navbar-brand  mb-1 h1" href="/">TAPER _ journey</a>
-            <button aria-controls="navbarNav" aria-expanded="false" class="navbar-toggler" type="button" data-target="#navbarNav" data-toggle="collapse">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ml-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="/signin">Sign In</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/signup">Sign Up</a>
-                    </li>
-                </ul>
-            </div>
-        </nav>
+            <!-- http://getbootstrap.com/docs/4.1/layout/overview/#containers -->
+            <main>
+                {% block main %}{% endblock %}
+            </main>
 
-        <!-- http://getbootstrap.com/docs/4.1/layout/overview/#containers -->
-        <main >
-            {% block main %}{% endblock %}
-        </main>
+            <footer >
+                <div style="font-weight:400; color:black; letter-spacing: 3px; font-size: 0.85rem"> Anja Thiart  |   <em>Copyright 2019 <span style="font-size:1.1rem">&copy</span> Short Shift Productions Pty. Ltd.</em></div>
+            </footer>
+
+        </div>
+
+
 
     </body>
 
