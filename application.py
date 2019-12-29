@@ -224,14 +224,11 @@ def signup():
     if request.method == "POST":
 
         usernameinput = request.form.get('username')
-        email = request.form.get('email')
         password = request.form.get('password')
 
         #--> Validate input
         if not usernameinput:
             return apology("No username entered", 400)
-        #if not email:
-            return apology("No email entered", 400)
         if not password:
             return apology("No password entered", 400)
 
@@ -243,7 +240,7 @@ def signup():
         if db.execute("SELECT username FROM users WHERE username = ?", (usernameinput)):
             return apology("The username is not available")
         else:
-            db.execute("INSERT INTO users (id, username, email, hash) VALUES (NULL, ?, ?, ?)", ( usernameinput,email,passwordHash))
+            db.execute("INSERT INTO users (id, username, hash) VALUES (NULL, ?, ?)", ( usernameinput,passwordHash))
             return redirect("/signin")
 
     else:

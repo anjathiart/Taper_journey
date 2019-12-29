@@ -55,7 +55,7 @@ input {
 
 
 #trackDrugsModal input {
-    text-align:right;
+
 }
 
 select {
@@ -69,6 +69,7 @@ input[type=checkbox] {
 
 button {
     box-shadow: 2px 2px 4px gray;
+    transition: all 0.5s;
 }
 
 .bg-custom {
@@ -312,8 +313,31 @@ i {
     margin: 10px
     padding: 10px;
     font-size: 1.5em;
-    cursor: pointer;
 }
+
+.icon-btn {
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.icon-btn:hover{
+    color: rgba(242, 95,105, 1);
+    font-size: 1.7rem;
+}
+
+#header-icon {
+    font-size: 1.7rem;
+    margin-right: 10px;
+    color:#4C4E53;
+    transition: all 0.3s;
+}
+
+#header-icon:hover {
+    color: rgba(242, 95,105, 1);
+    font-size: 1.9rem;
+}
+
 
 
 div .iconLink {
@@ -338,6 +362,9 @@ div .iconLink {
   margin-bottom: 10px;
 }
 
+i {
+    display: block;
+}
 
 
 .wrapper {

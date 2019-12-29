@@ -4,9 +4,8 @@
 <div  class="modal" id="trackDrugsModal" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
-
             <div class="modal-header container" style="z-index:30">
-                <div class="header"><i style = "margin-right: 10px;color:darkGray" class="far fa-calendar-alt"></i><input class="shadow-none" id="myDatepicker"></div>
+                <div class="header"><i id="header-icon"  class="far fa-calendar-alt icon-btn"></i><input class="shadow-none" id="myDatepicker"></div>
                 <button id="journalButton"  class="shadow-none"  data-toggle="modal" data-target="#journalModal" data-backdrop="static" keyboard=false>Journal</button>
             </div>
             <div class="modal-body">
@@ -81,7 +80,7 @@
                 </div>
                 <textarea class="form-control" id="journal" value="" name="journal" style="height:50vh" value="" autofocus></textarea>
             </div>
-            <div class="modal-footer">
+            <div class="modal-footer container">
                 <div class = "btn-group pull-left" data-toggle="popover"
                         data-animation="true"  data-content="Changes will are not saved atoamatically. Click here to discard the changes"
                         data-trigger="hover" data-placement="bottom" disabled>
@@ -106,13 +105,13 @@
 
 <div class="split right" id="latestData">
     <div class="wrapper">
-        <h3 style="margin-bottom: 10px" class="font-weight-light" >Journey Status</h3>
+        <h3 style="margin-bottom: 20px" class="font-weight-light" >Journey Status</h3>
         <h6 class="push-right" style="font-style:italic; margin-left: 60px">Latest update:</h6>
         <div id="borderContainer">
             <div class="container">
                 <div><i style = "margin-right: 10px" class="far fa-calendar-alt"></i><input  id="latestDate"  autocomplete="off"></div>
                 <div style="font-style:italic">Mood: <span id="mood2">{{page_data.mood}}</span>/10</div>
-                <i class="far fa-edit"  id="showDrugdata" data-toggle="modal" data-target="#trackDrugsModal"></i>
+                <i class="far fa-edit icon-btn"  id="showDrugdata" data-toggle="modal" data-target="#trackDrugsModal"></i>
                 <!--  -->
             </div>
             <div class="containter">
@@ -147,6 +146,25 @@
     </div>
 </div>
 
+<div class="split right" id="newUser" style="padding-top:80px">
+    <div class="wrapper" >
+        <div class="container">
+            <h3 style="margin-bottom: 20px" class="font-weight-light" >Journey Status</h3>
+            <i style="font-size: 2rem" class="far fa-edit icon-btn"  id="showDrugdata" data-toggle="modal" data-target="#trackDrugsModal"></i>
+        </div>
+        <div id="borderContainer" style="font-size: 1.3rem">
+            Welcome! To start tracking your medication / mood / side-effects or to write a journal entry, click on the edit icon above to the right.
+        </div>
+        <div class="container" >
+
+        </div>
+
+    </div>
+</div>
+
+
+</div>
+
 <!-- Page Content -->
 <section class="container py-5">
 </div>
@@ -156,6 +174,16 @@
 <script language="javascript" type="text/javascript">
 
     $(document).ready(function() {
+
+
+
+        if("{{page_data.date}}" === '') {
+            $('#latestData').hide();
+            $('#newUser').show();
+        } else {
+            $('#latestData').show();
+            $("#newUser").hide();
+        }
 
         var today = new Date();
         $('#myDatepicker').datepicker({ dateFormat: 'DD, dd M yy', endDate: "today", maxDate: today}).val();
