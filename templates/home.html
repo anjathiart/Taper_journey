@@ -115,7 +115,7 @@
                 <!--  -->
             </div>
             <div class="containter">
-                <div id="journeyStatusSideEffects" align=center style="margin-bottom: 10px" ><em style="margin-right: 10px">Side-effects:</em>{{ page_data.side_effects | replace(",", ", ") }}</div>
+                <div id="journeyStatusSideEffects" align=center style="margin-bottom: 10px" ><em style="margin-right: 10px">Side-effects:</em><span id="side_effects2">{{ page_data.side_effects | replace(",", ", ") }}</span></div>
             </div>
 
             <table id="latestSummaryTable" class="table table-hover">
@@ -177,7 +177,7 @@
 
     $(document).ready(function() {
 
-
+        // console.log("{{page_data}}");
         // show the appliccable dashboard / home page based on a new user or user that has not logged any data yet
         // vs a user who has already used the app to track data
         if("{{page_data.date}}" === '') {
@@ -190,19 +190,18 @@
             $("#newUser").hide();
         }
 
-
-        // toggle show journey status page mood if it is set
-        if("{{page_data.mood}}" !== 'NULL' || "{{page_data.mood}}" !== '') {
-            $('#journeyStatusMood').show();
-        } else {
+        // toggle if mood info must be shown or not
+        if("{{page_data.mood}}" === '' || "{{page_data.mood}}" === 'NULL') {
             $('#journeyStatusMood').hide();
+        } else {
+            $('#journeyStatusMood').show();
         }
 
-        // toggle show journey status page side effects if they are listed
-        if("{{page_data.side_effects}}" !== 'NULL') {
-            $('#journeyStatusSideEffects').show();
-        } else {
+        // toggle if side-effects info must be shown or not
+        if("{{page_data.side_effects}}" === '' || "{{page_data.side_effects}}" === 'NULL') {
             $('#journeyStatusSideEffects').hide();
+        } else {
+            $('#journeyStatusSideEffects').show();
         }
 
 
@@ -240,6 +239,7 @@
             // Load up a new modal...
             $('#trackDrugsModal').modal('hide')
         })
+
 
         // revert back to most recently saved journal
         $(document).on("click", "#journalDiscard",  function() {
@@ -294,11 +294,13 @@
             event.preventDefault()
 
             // get all the data
-            let data = {};
-            data = getUserData();
+            let data = getUserData();
 
             // check validation
             let inputValid = validate(data);
+
+            console.log(data);
+            // toggleJourneySatusHTML(data.mood, data.side_effects, data.drugs);
 
             if (inputValid) {
                 // post the data to the backend to either updata or insert into database
@@ -322,7 +324,6 @@
         $('#trackDrugsModal tbody').html(" ")
         $.post("/gettaperdata",{date: date}, function(data) {
         }).done(function(data){
-             console.log(data)
             updateFields(data)
         }).fail(function(xhr, status, error) {alert(error)});
     }
@@ -363,7 +364,6 @@
         if (data.side_effects) {
             sideEffectsSelected = data.side_effects.split(",")
         } else {
-            console.log ("trying to split second side-effects NULL")
             sideEffectsSelected = [];
         }
         for (let i=0; i<sideEffectsSelected.length; i++) {
@@ -373,7 +373,6 @@
             $('[data-toggle="popover"]').popover()
         });
 
-        console.log(data.mood);
         if (data.mood > 0) {
             $("#moodValue").addClass("moodChosen");
             $("#mood").val(data.mood);
@@ -385,13 +384,12 @@
 
         const drugs_array = drugs;
         const doses_array = doses;
-        console.log (drugs_array)
         const drugInputAttr = " type='number' class='form-control form-control-sm dose'  name='dose' style='width:80px' placeholder='' ";
         const drugInputPopover = " data-toggle='popover' data-animation='true' data-content='Enter your daily dosage in milligrams' data-trigger='hover' data-placement='right' ";
         const removeButton = " <td><button class='shadow-none' style='padding: 0px 10px' onclick='removeDrug(this)'>X</td> "
         let drugsInnerHTML = "";
         for (let i = 0; i < drugs_array.length; i++) {
-            const drugInput = "<td><input  id='dose" + drugs_array[i] + "' value ='" + doses_array[i] + "' " + drugInputAttr + drugInputPopover +  "></td>";
+            const drugInput = "<td><input name='trackedMedDosage' id='dose" + drugs_array[i] + "' value ='" + doses_array[i] + "' " + drugInputAttr + drugInputPopover +  "></td>";
             drugsInnerHTML += "<tr><td class='drugName' id=" + drugs_array[i] + ">" + drugs_array[i] + "</td>" + drugInput + removeButton + "</tr>";
         }
         return "<thead><tr><th>Medicine</th><th>Dose</th></tr></thead><tbody> " + drugsInnerHTML + " </tbody>";
@@ -406,7 +404,7 @@
         $(".drugName").each(function(){
             drugs.push($(this).html())
         })
-        $("[name='dose'").each(function(){
+        $("[name='trackedMedDosage']").each(function(){
             doses.push($(this).val())
         })
         drugs = drugs.join();
@@ -428,15 +426,30 @@
     function validate(dataObject) {
         // check that dosages are filled in and not negative
         let valid = false;
-        let doses = dataObject.doses.split(",");
 
-        for(let i = 0; i <= doses.length; i++) {
-            if (doses[i] === '') {
-                alert("Dosages must be specified and greater than zero. If you are not taking a given medication any longer, remove it from your list by clicking on the 'X' button next to it.");
-                return false;
-            } else if (parseInt(doses[i]) <= 0) {
-                alert("Dosages must be specified and greater than zero. If you are not taking a given medication any longer, remove it from your list by clicking on the 'X' button next to it.");
-                return false;
+        // if no drugs are being tracked, both the drugs string and the doses string will be empty
+        if (dataObject.drugs === dataObject.doses) {
+            return true;
+        }
+        console.log(dataObject);
+        let drugs = dataObject.drugs.split(',');
+        let doses = dataObject.doses.split(',');
+
+        if (drugs.length !== doses.length) {
+            alert("Dosages must be specified and greater than zero. If you are not taking a given medication any longer, remove it from your list by clicking on the 'X' button next to it.");
+            console.log('x');
+            return false;
+        } else {
+            for(let i = 0; i <= doses.length; i++) {
+                if (doses[i] === '') {
+                    alert("Dosages must be specified and greater than zero. If you are not taking a given medication any longer, remove it from your list by clicking on the 'X' button next to it.");
+                    console.log('y');
+                    return false;
+                } else if (parseInt(doses[i]) <= 0) {
+                    console.log('z');
+                    alert("Dosages must be specified and greater than zero. If you are not taking a given medication any longer, remove it from your list by clicking on the 'X' button next to it.");
+                    return false;
+                }
             }
         }
 
@@ -508,6 +521,33 @@
             alert("error")
         });
     }
+
+    function toggleJourneySatusHTML(mood, side_effects, drugs) {
+
+        // toggle show journey status page mood if it is set
+        if(mood === 'NULL' || mood  === '') {
+            $('#journeyStatusMood').hide();
+        } else {
+            $('#journeyStatusMood').show();
+        }
+        console.log(side_effects);
+        console.log(drugs);
+        // toggle show journey status page side effects if they are listed
+        if(side_effects  === '' || side_effects === 'NULL' ) {
+            $('#journeyStatusSideEffects').hide();
+        } else {
+            $('#journeyStatusSideEffects').show();
+        }
+
+        // toggle show journey status page medication table
+        if (drugs !== '') {
+            $('#latestSummaryTable').show();
+        } else {
+            $('#latestSummaryTable').hide();
+        }
+    }
+
+
 
 </script>
 

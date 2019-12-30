@@ -216,7 +216,7 @@ def posttaperdata():
     #parse the date
     dateFormatted = request.form.get("date")
     date = datetime.strptime(dateFormatted, "%A, %d %b %Y").strftime("%Y-%m-%d")
-
+    # print(f"{request.form.get('drugs')}")
     drugs = request.form.get('drugs')
     doses = request.form.get('doses')
     mood = request.form.get("mood")
@@ -224,11 +224,16 @@ def posttaperdata():
     side_effects = request.form.get("side_effects")
 
     #--> Validate input
-    if not drugs:
+    # TODO --> why are the apology pages not alweays rendering?
+    if not drugs and doses:
+        print("x")
+        return apology("No drugs chosen", 400)
+    if not doses and drugs:
+        print("y")
         return apology("No dose chosen", 400)
-    if not doses:
-        return apology("No dose chosen", 400)
+
     if not mood:
+        print("x")
         return apology("No mood specified", 400)
     if not side_effects:
         side_effects = "NULL"
@@ -330,7 +335,7 @@ def getjournal():
 @app.route("/getdrugoptionslist", methods=["POST"])
 @signin_required
 def getdrugoptionslist():
-    return {"options": ["Cymbalta", "Epitec", "Abilify", "Ivedel", "Dorminox", "Meletonin", "Wellbutrin", "Lithium", "Zoloft", "Xanax"]}
+    return {"options": ["Cymbalta", "Epitec", "Abilify", "Ivedel"]}
 
 
 # returns a list of all possible side-effects that the user can choose from
