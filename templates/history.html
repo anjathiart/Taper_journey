@@ -7,7 +7,7 @@
         <h3 class="font-weight-light" >Your taper journey up to now</h3>
         <div id="borderContainer">
             <div class="container">
-                <div>
+                <div style="margin-top:10px">
                     <i style = "margin-right: 10px" class="fas fa-filter"></i><span style="margin-right: 10px">Medication:</span>
                     <select id="drugNames" value="">
                         <option name="drugName" id="All">All</option>
@@ -46,7 +46,6 @@
                         <!-- <td><button class="shadow-none">X</button ></td> -->
                     </tr>
                     {% endfor %}
-
                 </tbody>
             </table>
         </div>
@@ -59,6 +58,7 @@
 
     $(document).ready(function() {
 
+        // filter history table based on medication value selected
         $("select").on("change", function (e) {
 
             let valueSelected = e.target.value;
