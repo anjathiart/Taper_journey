@@ -49,18 +49,15 @@ def index():
         drug_options = ["Cymbalta", "Epitec", "Abilify", "Ivedel"]
         side_effect_options = ["Fatigue", "Nausea", "Headache", "Weight-gain", "Weight-los", "Mania", "Insomnia"]
         pageData = {"drug_options": drug_options, "side_effect_options": side_effect_options}
-
         data = {"date": '', "drugInfo": [], "mood": '', "side_effedts": '', "side_effect_options": side_effect_options, "drug_options":drug_options,  "journal": '', "journal_date": ''}
-        print(f"{data}")
         return render_template("home.html", page_data=data)
     else:
         #initialise drugInfo for day | date | object: drug, dose | mood |journal | side_effects
         drugInfo = [];
+
         # get the info for the latest entry date
         row = db.execute("SELECT * FROM entries WHERE user_id=? ORDER BY entry_date DESC", session["user_id"])
         dateHTML = datetime.strptime(row[0]["entry_date"], "%Y-%m-%d").strftime("%A, %d %b %Y")
-        print(f"{row[0]['drugs']}")
-        print(f"{dateHTML}")
         drugs = []
         doses=[]
         mood = ''
@@ -73,6 +70,7 @@ def index():
 
         journal_date=''
         journal = ''
+
         # find latest journal entry
         if not row[0]["journal"]:
             row2 = db.execute("SELECT journal, entry_date From entries WHERE user_id=? AND journal IS NOT NULL ORDER BY entry_date DESC" , (session["user_id"]))
@@ -89,15 +87,17 @@ def index():
             drugEntry = {"drug":  drugs[i], "dose": doses[i]}
             drugInfo.append(drugEntry)
 
+        #TODO --> revisit this, I think these arrays are obsolete and these values are retrieved by their own separate API calls
         drug_options = ["Cymbalta", "Epitec", "Abilify", "Ivedel"]
         side_effect_options = ["Fatigue", "Nausea", "Headache", "Weight-gain", "Weight-los", "Mania", "Insomnia"]
+
         pageData = {"drug_options": drug_options, "side_effect_options": side_effect_options}
 
         data = {"date": dateHTML, "drugInfo": drugInfo, "mood": mood, "side_effects": side_effects, "side_effect_options": side_effect_options, "drug_options":drug_options,  "journal": journal, "journal_date": journal_date,"pageData": pageData}
-        print(f"{data}")
         return render_template("home.html", page_data=data)
 
 
+# send an object to the frontend with all the relevant historical information to populate the history page
 @app.route("/history", methods=["GET", "POST"])
 @signin_required
 def history():
@@ -107,6 +107,7 @@ def history():
         rows = db.execute("SELECT * FROM entries WHERE user_id = ? ORDER BY entry_date DESC", (session["user_id"]))
         data = []
         all_drugs=[]
+
         # loop over each row and append all the data for that row and for each drug into a temporary object then append it to the main object.
         for row in rows:
             temp_row = [];
@@ -132,7 +133,7 @@ def history():
             for entry in data:
                 if entry["drug"] == request.form.get("Value"):
                     newList.append(entry)
-    print(f"{newList}")
+
     return render_template("history.html", page_data=newList, drugNames=list(set(all_drugs)))
 
 # send all the journal entries to the journal blog page
@@ -147,48 +148,7 @@ def journal():
         for row in rows:
             journal_data.append({"date": row["entry_date"], "entry": row["journal"]})
 
-        return render_template("journal.html", page_data=journal_data)
-
-
-@app.route("/filter")
-@signin_required
-def filter():
-    if request.method == "GET":
-        if not (db.execute("SELECT * FROM entries WHERE user_id = ? ORDER BY entry_date DESC", (session["user_id"]))):
-            data={"hasHistory" : "false"}
-        else:
-            rows = db.execute("SELECT * FROM entries WHERE user_id = ? ORDER BY entry_date DESC", (session["user_id"]))
-            data = []
-
-            # loop over each row and append all the data for that row and for each drug into a temporary object then append it to the main object.
-            for row in rows:
-                temp_row = [];
-                if (row["drugs"]):
-                    mood = row["mood"]
-                    drugs = row["drugs"].split(",")
-                    doses = row["doses"].split(",")
-                    mood = row["mood"]
-                    date = row["entry_date"]
-                    side_effects = row["side_effects"].split(",")
-                    all_drugs += drugs
-                    for i in range(len(drugs)):
-                        temp_row = {"drug": drugs[i], "dose": doses[i], "mood": mood, "date": date, "side_effects": side_effects}
-                        data.append(temp_row)
-                else:
-                    continue
-            print(f"{data}")
-
-
-        return render_template("history.html", page_data=data, drugNames=list(set(all_drugs)))
-    else:
-        return apology("TODO", 400)
-
-
-    # get what the user wants to filter on can be date or medicne or both
-
-
-
-
+    return render_template("journal.html", page_data=journal_data)
 
 
 @app.route("/signin", methods=["GET", "POST"])
@@ -205,7 +165,7 @@ def signin():
         if not request.form.get("password"):
             return apology("No password entered", 400)
 
-       # Query database for username
+        # Query database for username
         rows = db.execute("SELECT * FROM users WHERE username = ?", request.form.get("username"))
 
         # Ensure username exists and password is correct
@@ -233,7 +193,6 @@ def signup():
             return apology("No password entered", 400)
 
         #--> hash the password
-
         passwordHash = generate_password_hash(request.form.get("password", "sha256"))
 
         # Query database to check that the username is not already taken and insert into database if not
@@ -242,25 +201,11 @@ def signup():
         else:
             db.execute("INSERT INTO users (id, username, hash) VALUES (NULL, ?, ?)", ( usernameinput,passwordHash))
             return redirect("/signin")
-
     else:
         return render_template("signup.html")
 
-@app.route("/taper", methods=["GET", "POST"])
-@signin_required
-def taper():
-    # if request.method == "POST":
-    #     drug_options = ["Cymbalta", "Epitec", "Abilify", "Ivedel"]
-    #     side_effect_options = ["Fatigue", "Nausea", "Headache", "Weigt-gain", "Weight-los", "Mania", "Insomnia"]
-    #     pageData = {"drug_options": drug_options, "side_effect_options": side_effect_options}
-    #     return render_template("taper.html", pageData = pageData)
-    # else:
-    #     drug_options = ["Cymbalta","Epitec","Abilify","Ivedel"]
-    #     side_effect_options = ["Fatigue","Nausea","Headache","Weigt-gain","Weight-los","Mania","Insomnia"]
-    #     pageData = {"drug_options": drug_options, "side_effect_options": side_effect_options}
-    #     return render_template("taper.html", pageData = pageData)
-    return apology("TODO / OUT OF DATE", 400)
 
+# Posts the taper data for a specific date to the backend
 @app.route("/posttaperdata", methods=["POST"])
 @signin_required
 def posttaperdata():
@@ -270,7 +215,6 @@ def posttaperdata():
 
     #parse the date
     dateFormatted = request.form.get("date")
-    print(f"{dateFormatted}")
     date = datetime.strptime(dateFormatted, "%A, %d %b %Y").strftime("%Y-%m-%d")
 
     drugs = request.form.get('drugs')
@@ -297,6 +241,7 @@ def posttaperdata():
     else:
         db.execute("INSERT INTO entries (id, drugs, doses, mood,side_effects, user_id, entry_date , journal) VALUES (NULL, ?, ?, ?,?,?,?, ?)",( drugs,doses,mood,side_effects, session["user_id"], date, journal))
         return redirect ("/")
+
 
 # Sends the taper data for a specific date to the front end
 @app.route("/gettaperdata", methods=["POST"])
@@ -339,36 +284,17 @@ def gettaperdata():
     return data
 
 
-
-# get the latest list of drugs being tracked by the user and send to front end
-@app.route("/getlatestdrugs", methods=["POST"])
-@signin_required
-def getlatestdrugs():
-
-     # data to be populated
-    dateHTML = request.form.get("date")
-    dateSQL = datetime.strptime(dateHTML, "%A, %d %b %Y").strftime("%Y-%m-%d")
-
-
-    row = db.execute("SELECT * FROM entries WHERE user_id= ? AND drugs IS NOT NULL AND entry_date <= ? ORDER BY entry_date DESC", (session["user_id"], dateSQL))
-    if not row:
-        data = "None"
-    else:
-        data = row[0]["drugs"]
-    return data
-
-
+# save / update a journal entry when a user saves a new entry / changes an existing entry
 @app.route("/postjournal", methods=["POST"])
 @signin_required
 def postjournal():
 
      # data to be populated
     journal = request.form.get("journal")
-
     dateHTML = request.form.get("date")
     dateSQL = datetime.strptime(dateHTML, "%A, %d %b %Y").strftime("%Y-%m-%d")
 
-    #check if th entry already exists, if it does make a update otherwise insert it into the existing database. If the journal is empty, set it to NULL
+    #check if th entry already exists, if it does make an update otherwise insert it into the existing database. If the journal is empty, set it to NULL
     if not db.execute("SELECT * FROM entries WHERE user_id = ? AND entry_date = ?", (session["user_id"], dateSQL)):
         if journal == "":
             db.execute("INSERT INTO entries (journal, user_id, entry_date) VALUES (NULL, ?, ?)", (session["user_id"], dateSQL))
@@ -381,6 +307,8 @@ def postjournal():
             db.execute("UPDATE entries SET journal=? WHERE user_id = ? AND entry_date=?", (journal, session["user_id"], dateSQL))
     return redirect("/")
 
+
+# get the journal entry for a requested date from the database and send it back to the front-end
 @app.route("/getjournal", methods=["POST"])
 @signin_required
 def getjournal():
@@ -397,17 +325,23 @@ def getjournal():
         print(f"{row}")
     return row[0]["journal"]
 
+# returns a list of all possible medications that the user can choose from
+# TODO --> eventually these values can be imported from an API that provides all psychiatric / sleep / anxiety medications
 @app.route("/getdrugoptionslist", methods=["POST"])
 @signin_required
 def getdrugoptionslist():
-    return {"options": ["Cymbalta", "Epitec", "Abilify", "Ivedel"]}
+    return {"options": ["Cymbalta", "Epitec", "Abilify", "Ivedel", "Dorminox", "Meletonin", "Wellbutrin", "Lithium", "Zoloft", "Xanax"]}
 
+
+# returns a list of all possible side-effects that the user can choose from
+# TODO --> eventually these values can also be imported from an API
 @app.route("/getsideeffectslist", methods=["POST"])
 @signin_required
 def getsideefectslist():
     return ["Fatigue", "Nausea", "Headache", "Weigt-gain", "Weight-los", "Mania", "Insomnia"]
 
 
+# log the user out and redirect to signin page
 @app.route("/logout")
 def logout():
     """Log user out"""
