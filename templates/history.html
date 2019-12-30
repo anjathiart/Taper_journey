@@ -37,10 +37,14 @@
                         <td align="center">{{ page_data[i].drug }}</td>
                         <td align="right">{{ page_data[i].dose}} mg</td>
                         <td align="center">
+                            {% if page_data[i].side_effects[0] != 'NULL' %}
                             {% for se in page_data[i].side_effects %}
                             {{ se }}
                             {{ ", " if not loop.last }}
                             {% endfor %}
+                            {% else %}
+                            none
+                            {% endif %}
                             </td>
                         <td align="right">{{ page_data[i].mood }}/10</td>
                         <!-- <td><button class="shadow-none">X</button ></td> -->
@@ -57,6 +61,8 @@
 <script language="javascript" type="text/javascript">
 
     $(document).ready(function() {
+
+        console.log("{{page_data[0].side_effects}}");
 
         // filter history table based on medication value selected
         $("select").on("change", function (e) {
