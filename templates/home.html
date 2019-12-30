@@ -30,7 +30,7 @@
                     <div class="collapse" id="drugOptions">
                         <hr>
                         <div class="form-group inline-form text-center drugOptionCheckboxes" ></div>
-                        <button class="shadow-none"onclick = "updateDrugOptions()">Confirm</button>
+                        <button class="shadow-none" onclick = "updateDrugOptions()">Confirm</button>
                     </div>
                     <hr>
                     <div id="sideEffectOptions" class="form-group text-center drug_data" >
@@ -110,12 +110,12 @@
         <div id="borderContainer">
             <div class="container">
                 <div><i style = "margin-right: 10px" class="far fa-calendar-alt"></i><input  id="latestDate"  autocomplete="off"></div>
-                <div style="font-style:italic">Mood: <span id="mood2">{{page_data.mood}}</span>/10</div>
+                <div id="journeyStatusMood" style="font-style:italic">Mood: <span id="mood2">{{page_data.mood}}</span>/10</div>
                 <i class="far fa-edit icon-btn"  id="showDrugdata" data-toggle="modal" data-target="#trackDrugsModal"></i>
                 <!--  -->
             </div>
             <div class="containter">
-                <div align=center style="margin-bottom: 10px" ><em style="margin-right: 10px">Side-effects:</em>{{ page_data.side_effects | replace(",", ", ") }}</div>
+                <div id="journeyStatusSideEffects" align=center style="margin-bottom: 10px" ><em style="margin-right: 10px">Side-effects:</em>{{ page_data.side_effects | replace(",", ", ") }}</div>
             </div>
 
             <table id="latestSummaryTable" class="table table-hover">
@@ -137,11 +137,13 @@
             </table>
         </div>
         {% if page_data.journal != "" %}
-        <div id = "journalContainer" style="padding-right:20px; margin-right:30px">
-            <h4 class="font-weight-light" style="margin-right: 10px">Journal</h4>
-            <p>{{ page_data.journal_date }}</p>
+        <div id = "journalContainer" style="padding-right:20px">
+            <h4 class="font-weight-light">Journal <sup style="font-size: 0.6em; font-weight:400; text-decoration: underline">{{ page_data.journal_date }}</sup></h4>
         </div>
-        <p id="journal_b" class="no-wrap">{{ page_data.journal }}</p>
+        <div class="text-just" style="padding-right: 30px; margin-bottom: 150px">
+            <p id="journal_b" class="no-wrap">{{ page_data.journal }}</p>
+        </div>
+
         {% endif %}
     </div>
 </div>
@@ -176,14 +178,33 @@
     $(document).ready(function() {
 
 
-
+        // show the appliccable dashboard / home page based on a new user or user that has not logged any data yet
+        // vs a user who has already used the app to track data
         if("{{page_data.date}}" === '') {
             $('#latestData').hide();
+            $('#noDrugsTrackedPlaceHolder').show();
             $('#newUser').show();
         } else {
             $('#latestData').show();
+            $('#noDrugsTrackedPlaceHolder').hide();
             $("#newUser").hide();
         }
+
+
+        // toggle show journey status page mood if it is set
+        if("{{page_data.mood}}" !== 'NULL' || "{{page_data.mood}}" !== '') {
+            $('#journeyStatusMood').show();
+        } else {
+            $('#journeyStatusMood').hide();
+        }
+
+        // toggle show journey status page side effects if they are listed
+        if("{{page_data.side_effects}}" !== 'NULL') {
+            $('#journeyStatusSideEffects').show();
+        } else {
+            $('#journeyStatusSideEffects').hide();
+        }
+
 
         var today = new Date();
         $('#myDatepicker').datepicker({ dateFormat: 'DD, dd M yy', endDate: "today", maxDate: today}).val();
@@ -191,36 +212,38 @@
         $('.fa-calendar-alt').click(function() {
             $("#myDatepicker").focus();
         });
-        console.log("{{page_data.date}}")
+
         $("#latestDate").val("{{ page_data.date }}")
         getsetState($("#myDatepicker").val());
 
-        // this needs to be moved into the html
+        // TODO: this needs to be moved into the html
         $('button').addClass("shadow-none")
 
+        // populate home template with the data for the user
         $("#myDatepicker").change(function(){
             getsetState($("#myDatepicker").val());
         })
 
+
         $("#mood").on("input", function() {
-            $("#moodValue").addClass("moodChosen")
-            $("#moodValue").html("Overall mood: " + ($("#mood").val()))
+            $("#moodValue").addClass("moodChosen");
+            $("#moodValue").html("Overall mood: " + ($("#mood").val()));
         })
 
+        // hide the tracking modal when the journal entry button is clicked
         $("#journalButton").on("click",  function(){
             $('#trackDrugsModal').modal('hide');
         });
 
+        // hide the tracknig modal when the journal modal is shown
         $('#journalModal').on('show.bs.modal', function () {
             // Load up a new modal...
-            $('#trackDrugsMdal').modal('hide')
+            $('#trackDrugsModal').modal('hide')
         })
 
         // revert back to most recently saved journal
-         $(document).on("click", "#journalDiscard",  function() {
-            console.log("You the discard journal route")
+        $(document).on("click", "#journalDiscard",  function() {
             $.post("/getjournal",  {date: $("#myDatepicker").val()},function(journal){
-
             }).done(function(journal){
                 $("#journalModal textarea").val(journal)
                 $('#trackDrugsModal').modal('show');
@@ -229,39 +252,30 @@
             });
         });
 
+        // completely delete the journal entry that is currently viewed
         $(document).on("click", "#journalDelete",  function() {
-            console.log("You the delete journal route")
             $("#journalModal textarea").val("")
             $.post("/postjournal",  {date: $("#myDatepicker").val(), journal: ""},function(){
-
             }).done(function(){
-
                 $('#trackDrugsModal').modal('show');
             }).fail(function(xhr, status, error) {
                 alert("error")
             });
         });
 
+        // save the journal entry to the back-end and show the tracking modal again
         $(document).on("click", "#journalSaveExit",  function(){
-            //save the contents to the backend
-            console.log("You the save and exit journal route")
-            console.log($("textarea").val())
             $.post('/postjournal', {date: $("#myDatepicker").val(), journal: $("#journalModal textarea").val()}, function() {
-
             }).done(function(){
-                // close the modal
                 $('#trackDrugsModal').modal('show');
             }).fail(function(xhr, status, error) {
                 alert("error")
             });
         });
 
+        // show the journal modal and populate it with the entry for the selected date.
         $(document).on("click", "#trackDrugsModal #journalButton",  function(){
-            //save the contents to the backend
-            console.log("You on the get journal route")
-            console.log($("textarea").val())
             $.post('/getjournal', {date: $("#myDatepicker").val()}, function(journal) {
-
             }).done(function(journal){
                 $("#journalMoadal textarea").val(journal);
                 $('#journalModal').modal('show');
@@ -270,6 +284,7 @@
             });
         });
 
+        // hide the journal modal when the tracking modal is shown
         $('#trackDrugsModal').on('show.bs.modal', function () {
             // Load up a new modal...
             $('#journalModal').modal('hide')
@@ -278,21 +293,24 @@
         $(document).on("click", "#submitAll", function(event) {
             event.preventDefault()
 
-            // check validation
-            validate();
-
             // get all the data
             let data = {};
             data = getUserData();
 
-            // post the data to the backend to either updata or insert into database
-            $.post("/posttaperdata", data, function(data){
-            }).done(function(){
-                $(location).attr('href',"/");
-            }).fail(function(xhr, status, error) {
-                alert("error")
-            });
+            // check validation
+            let inputValid = validate(data);
 
+            if (inputValid) {
+                // post the data to the backend to either updata or insert into database
+                $.post("/posttaperdata", data, function(data){
+                }).done(function(){
+                    $(location).attr('href',"/");
+                }).fail(function(xhr, status, error) {
+                    alert("error")
+                });
+            } else {
+                $('#trackDrugsModal').modal('show');
+            }
         });
 
         $(function () {
@@ -307,11 +325,6 @@
              console.log(data)
             updateFields(data)
         }).fail(function(xhr, status, error) {alert(error)});
-
-        /*$.post("/getjournal", {date: $("#myDatepicker").val()}, function(data) {
-        }).done(function(data){
-        $("textarea").html(data.journal)
-        }).fail(function(xhr, status, error) { alert(error)});*/
     }
 
     function updateFields(data) {
@@ -358,7 +371,14 @@
         }
         $(function () {
             $('[data-toggle="popover"]').popover()
-        })
+        });
+
+        console.log(data.mood);
+        if (data.mood > 0) {
+            $("#moodValue").addClass("moodChosen");
+            $("#mood").val(data.mood);
+            $("#moodValue").html("Overall mood: " + ($("#mood").val()));
+        }
     }
 
     function getDrugDetailsHTML(drugs, doses) {
@@ -404,23 +424,41 @@
         return data;
     }
 
-    function validate() {
+    // TODO --> check that all required inputs have been filled out. This includes mood and dosages.
+    function validate(dataObject) {
+        // check that dosages are filled in and not negative
+        let valid = false;
+        let doses = dataObject.doses.split(",");
+
+        for(let i = 0; i <= doses.length; i++) {
+            if (doses[i] === '') {
+                alert("Dosages must be specified and greater than zero. If you are not taking a given medication any longer, remove it from your list by clicking on the 'X' button next to it.");
+                return false;
+            } else if (parseInt(doses[i]) <= 0) {
+                alert("Dosages must be specified and greater than zero. If you are not taking a given medication any longer, remove it from your list by clicking on the 'X' button next to it.");
+                return false;
+            }
+        }
+
+        // check that a mood for the day has been selected
+        if (!$("#moodValue").hasClass("moodChosen")) {
+            alert("You have not specified your overall mood for the day. Use the slider to set it on a scale of 1 (horrible) to 10 (excellent). Use the Journal feuture to go into more detail regarding your mood if need be!");
+            return false;
+        }
+        return true;
     }
 
+    // re-render the list of drugs being tracked
     function updateDrugOptions () {
-        // re-render the list of drugs being tracked
-
-
         $("input[name='drugOption']:checkbox:checked").each(function(){
             myID = $(this).attr("id").replace("option", "");
             if (!document.getElementById(myID)) {
                 // add drugs to list
                 const drugInputAttr = " type='number' class='form-control form-control-sm dose'  name='dose' style='width:80px' placeholder='' ";
                 const drugInputPopover = " data-toggle='popover' data-animation='true' data-content='Enter your daily dosage in milligrams' data-trigger='hover' data-placement='right' ";
-                const drugInput = "<td><input  id='dose" + myID + "' value ='" + "" + "' " + drugInputAttr + drugInputPopover +  "></td>";
+                const drugInput = "<td><input name='trackedMedDosage' id='dose" + myID + "' value ='" + "" + "' " + drugInputAttr + drugInputPopover +  "></td>";
                 const removeButton = " <td><button class='shadow-none' style='padding: 0px 10px' onclick='removeDrug(this)'>X</td> "
                 const drugsInnerHTML = "<tr><td class='drugName' id=" + myID + ">" + myID + "</td>" + drugInput + removeButton +"</tr>";
-
                 $("#drugEntry tbody").append(drugsInnerHTML);
             }
             $(this).parent().remove()
@@ -428,15 +466,17 @@
     }
 
     function removeDrug(el) {
+
+        // remove a drug from the tracked drugs list
         drug =  $(el).parent().parent().children(".drugName").html()
         id = "option" + drug;
         $(el).parent().parent().remove();
+
         // add back to list of checkboxes
         inputHTML = "<input class='form-check-input' type='checkbox' name='drugOption' id ='" + id +"' value = '"+ drug + "' > ";
         labelHTML= " <label class='form-check-label' for = '" + id + "' >" + drug + "</label> ";
         checkboxHTML = "<div class='form-check form-check-inline'>" + inputHTML + labelHTML + " </div>";
         $(".drugOptionCheckboxes").append(checkboxHTML)
-
     }
 
     function buildDrugOptionsList(list) {
@@ -450,15 +490,17 @@
         }
     }
 
+    // delete a journal entry in the database by setting its value to "" and update the journal textarea to show nothing ("")
     function deleteJournal() {
-            $.post("/postjournal",  {date: $("#myDatepicker").val(), journal: ""},function(){
-            }).done(function(){
-                $("#journalModal textarea").val("")
-            }).fail(function(xhr, status, error) {
-                alert("error")
-            });
-        }
+        $.post("/postjournal",  {date: $("#myDatepicker").val(), journal: ""},function(){
+        }).done(function(){
+            $("#journalModal textarea").val("")
+        }).fail(function(xhr, status, error) {
+            alert("error")
+        });
+    }
 
+    // save the current journal entry state to the backend
     function saveJournal() {
         $.post('/postjournal', {date: $("#myDatepicker").val(), journal: $("#journalModal textarea").val()}, function() {
         }).done(function(){
