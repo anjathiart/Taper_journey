@@ -1,6 +1,7 @@
 # CS50x 2019 Final Project: TAPER JOURNEY
 This document briefly explains my final project web application, called Taper Journey. It is a mental health tracking app that allows you to track daily psychiatric medications, dosages, mood, side-effects. It also has a journal feuture where one can write in on a daily basis.
 
+Here is a very short video link: https://www.youtube.com/watch?v=gRXK-b9SqEg
 
 ## Motivation for this project
 I came up with this idea as I am a mental health patient and, at the time, was on various medications, some of which I wanted to discontinue using. As most mental health patients know, tapering off of these drugs are not easy, and stopping cold-turkey can cause major withdrawals and relapses. It is thus very important to taper off medications slowly, with care, and under strict medical supervision. This made me think of creating an app that helps one to keep track of such a tapering-off journey to see progress when times are tough, or to flag issues with the process. The bigger idea is to have this app integrate with healthcare practitioners and services, but this is beyond the scope of this first version, call it Beta, call it MVP, of Taper Journey.
